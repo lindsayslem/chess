@@ -41,6 +41,8 @@ public class BishopMovesCalculator {
                 currentCol += colDirection;
             }
         }
+        /*returns all valid move*/
         return legalMoves;
+
     }
 }
