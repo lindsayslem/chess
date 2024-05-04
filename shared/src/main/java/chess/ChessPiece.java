@@ -55,8 +55,10 @@ public class ChessPiece {
             BishopMovesCalculator bishopMovesCalculator = new BishopMovesCalculator(pieceColor, board);
             return bishopMovesCalculator.pieceMove(myPosition);
         }
-        else{
-            return null;
+        if(type == PieceType.KING){
+            KingMovesCalculator kingMovesCalculator = new KingMovesCalculator(pieceColor, board);
+            return kingMovesCalculator.pieceMove(myPosition);
         }
+        return null;
     }
 }
