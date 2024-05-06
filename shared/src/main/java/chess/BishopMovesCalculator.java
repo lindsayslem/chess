@@ -24,7 +24,7 @@ public class BishopMovesCalculator {
             int currentRow = position.getRow() + rowDirection;
             int currentCol = position.getColumn() + colDirection;
 
-            while(currentRow >= 0 && currentRow  < 8 && currentCol >= 0 && currentCol < 8){
+            while(currentRow > 0 && currentRow  < 8 && currentCol > 0 && currentCol < 8){
                 ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
                 ChessPiece newPositionPiece = board.getPiece(newPosition);
 
