@@ -18,25 +18,28 @@ public class PawnMovesCalculator {
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
 
-        if(currentRow == 2 || currentRow == 6){
+        if(currentRow == 2 || currentRow == 7){
             ChessPosition newPosition = new ChessPosition(currentRow + 2, currentCol);
             legalMoves.add(new ChessMove(position, newPosition, null));
         }
         else{
-            ChessPosition forwardPosition = new ChessPosition(currentRow + 1, currentCol);
+            ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol);
             ChessPiece newPositionPiece = board.getPiece(newPosition);
-            if (forwardPositionPiece == null) {
+            if (newPositionPiece == null) {
                 legalMoves.add(new ChessMove(position, newPosition, null));
             } else {
-                if (newPositionPiece.getTeamColor() != pieceColor) {
-                    legalMoves.add(new ChessMove(position, newPosition, null));
+                ChessPosition diagonalRight = new ChessPosition(currentRow + 1, currentCol + 1);
+                ChessPosition diagonalLeft = new ChessPosition(currentRow + 1, currentCol - 1);
+                ChessPiece diagonalRightPiece = board.getPiece(diagonalRight);
+                ChessPiece diagonalLeftPiece = board.getPiece(diagonalLeft);
+                if (diagonalRightPiece.getTeamColor() != pieceColor) {
+                    legalMoves.add(new ChessMove(position, diagonalRight, null));
                 }
-            ChessPosition rightPosition = new ChessPosition(currentRow, currentCol + 1);
-            legalMoves.add(new ChessMove(position, rightPosition, null));
-            ChessPosition leftPosition = new ChessPosition(currentRow, currentCol -1);
-            legalMoves.add(new ChessMove(position, leftPosition, null));
+                else if(diagonalLeftPiece.getTeamColor() != pieceColor) {
+                    legalMoves.add(new ChessMove(position, diagonalLeft, null));
+                }
+                }
         }
-
         return legalMoves;
     }
 }
