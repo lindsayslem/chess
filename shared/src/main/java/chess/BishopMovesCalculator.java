@@ -35,6 +35,9 @@ public class BishopMovesCalculator {
                     if(newPositionPiece.getTeamColor() != pieceColor){
                         legalMoves.add(new ChessMove(position, newPosition, null));
                     }
+                    if(newPositionPiece.getTeamColor() == pieceColor){
+                        break;
+                    }
                     break;
                 }
                 currentRow += rowDirection;
