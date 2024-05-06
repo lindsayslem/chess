@@ -63,6 +63,14 @@ public class ChessPiece {
             KnightMovesCalculator knightMovesCalculator = new KnightMovesCalculator(pieceColor, board);
             return knightMovesCalculator.pieceMove(myPosition);
         }
+        if(type == PieceType.PAWN){
+            PawnMovesCalculator pawnMovesCalculator = new PawnMovesCalculator(pieceColor, board);
+            return pawnMovesCalculator.pieceMove(myPosition);
+        }
+        if(type == PieceType.QUEEN){
+            QueenMovesCalculator queenMovesCalculator = new QueenMovesCalculator(pieceColor, board);
+            return queenMovesCalculator.pieceMove(myPosition);
+        }
         return null;
     }
 }
