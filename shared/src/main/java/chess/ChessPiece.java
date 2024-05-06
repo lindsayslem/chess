@@ -71,6 +71,10 @@ public class ChessPiece {
             QueenMovesCalculator queenMovesCalculator = new QueenMovesCalculator(pieceColor, board);
             return queenMovesCalculator.pieceMove(myPosition);
         }
+        if(type == PieceType.ROOK){
+            RookMovesCalculator rookMovesCalculator = new RookMovesCalculator(pieceColor, board);
+            return rookMovesCalculator.pieceMove(myPosition);
+        }
         return null;
     }
 }
