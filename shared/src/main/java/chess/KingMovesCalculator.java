@@ -15,7 +15,7 @@ public class KingMovesCalculator {
     public Collection<ChessMove> pieceMove(ChessPosition position){
         List<ChessMove> legalMoves = new ArrayList<>();
 
-        int[][] moves = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}, {0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        int[][] moves = {{1, 0}, {1, 1}, {0, 1}, {-1, 1},{-1, 0}, {-1, -1}, {0, -1}, {1, -1}};
 
         for(int[] move : moves){
             int rowDirection = move[0];
@@ -26,6 +26,7 @@ public class KingMovesCalculator {
 
             ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
             ChessPiece newPositionPiece = board.getPiece(newPosition);
+
 
             if(newPositionPiece == null){
                 legalMoves.add(new ChessMove(position, newPosition, null));

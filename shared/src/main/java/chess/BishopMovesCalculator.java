@@ -25,7 +25,6 @@ public class BishopMovesCalculator {
             int currentCol = position.getColumn() + colDirection;
 
             while(currentRow > 0 && currentRow  < 9 && currentCol > 0 && currentCol < 9){
-                System.out.println("Current position: (" + currentRow + ", " + currentCol + ")");
                 ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
                 ChessPiece newPositionPiece = board.getPiece(newPosition);
 
@@ -36,9 +35,6 @@ public class BishopMovesCalculator {
                     if(newPositionPiece.getTeamColor() != pieceColor){
                         legalMoves.add(new ChessMove(position, newPosition, null));
                     }
-                    /*if(newPositionPiece.getTeamColor() == pieceColor){
-                        break;
-                    }*/
                     break;
                 }
                 currentRow += rowDirection;
