@@ -24,18 +24,18 @@ public class KingMovesCalculator {
             int currentRow = position.getRow() + rowDirection;
             int currentCol = position.getColumn() + colDirection;
 
-            ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
-            ChessPiece newPositionPiece = board.getPiece(newPosition);
+            if(currentRow > 0 && currentRow <= 8 && currentCol > 0 && currentCol <=8) {
+                ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
+                ChessPiece newPositionPiece = board.getPiece(newPosition);
 
 
-            if(newPositionPiece == null){
-                legalMoves.add(new ChessMove(position, newPosition, null));
-            }
-            else{
-                if(newPositionPiece.getTeamColor() != pieceColor){
+                if (newPositionPiece == null) {
                     legalMoves.add(new ChessMove(position, newPosition, null));
+                } else {
+                    if (newPositionPiece.getTeamColor() != pieceColor) {
+                        legalMoves.add(new ChessMove(position, newPosition, null));
+                    }
                 }
-                break;
             }
         }
         return legalMoves;
