@@ -25,7 +25,7 @@ public class KnightMovesCalculator {
             int currentRow = position.getRow() + rowDirection;
             int currentCol = position.getColumn() + colDirection;
 
-            if (currentRow >= 0 && currentRow < 8 && currentCol >= 0 && currentCol < 8) {
+            if (currentRow > 0 && currentRow <= 8 && currentCol > 0 && currentCol <= 8) {
                 ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
                 ChessPiece newPositionPiece = board.getPiece(newPosition);
 
