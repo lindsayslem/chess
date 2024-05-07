@@ -15,7 +15,7 @@ public class BishopMovesCalculator {
     public Collection<ChessMove> pieceMove(ChessPosition position){
         List<ChessMove> legalMoves = new ArrayList<>();
 
-        int[][] diagonals = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        int[][] diagonals = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
 
         for(int[] diagonal : diagonals){
             int rowDirection = diagonal[0];
@@ -24,7 +24,7 @@ public class BishopMovesCalculator {
             int currentRow = position.getRow() + rowDirection;
             int currentCol = position.getColumn() + colDirection;
 
-            while(currentRow > 0 && currentRow  < 8 && currentCol > 0 && currentCol < 8){
+            while(currentRow > 0 && currentRow  < 9 && currentCol > 0 && currentCol < 9){
                 System.out.println("Current position: (" + currentRow + ", " + currentCol + ")");
                 ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
                 ChessPiece newPositionPiece = board.getPiece(newPosition);
@@ -36,9 +36,9 @@ public class BishopMovesCalculator {
                     if(newPositionPiece.getTeamColor() != pieceColor){
                         legalMoves.add(new ChessMove(position, newPosition, null));
                     }
-                    if(newPositionPiece.getTeamColor() == pieceColor){
+                    /*if(newPositionPiece.getTeamColor() == pieceColor){
                         break;
-                    }
+                    }*/
                     break;
                 }
                 currentRow += rowDirection;
