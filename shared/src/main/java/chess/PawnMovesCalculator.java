@@ -23,17 +23,20 @@ public class PawnMovesCalculator {
             if (currentRow == 2) {
                 ChessPosition newPosition = new ChessPosition(position.getRow() + 2, currentCol);
                 ChessPosition frontPosition = new ChessPosition(position.getRow() + 1, currentCol);
-                if (board.getPiece(newPosition) == null) {
+                if (board.getPiece(newPosition) == null && board.getPiece(frontPosition) == null) {
+                    legalMoves.add(new ChessMove(position, newPosition, null));
                     if (board.getPiece(frontPosition) == null) {
-                        legalMoves.add(new ChessMove(position, newPosition, null));
+                        legalMoves.add(new ChessMove(position, frontPosition, null));
+
                     }                }
             }
             ChessPosition newPosition = new ChessPosition(currentRow + 1, currentCol);
-            if (board.getPiece(newPosition) == null && newPosition.getRow() != 8) {
+            if (board.getPiece(newPosition) == null && newPosition.getRow() != 8 && newPosition.getRow() < 8) {
                 legalMoves.add(new ChessMove(position, newPosition, null));
             }
-            ChessPosition diagonalRight = new ChessPosition(currentRow + 1, currentCol + 1);
-            if (currentRow > 0 && currentRow < 9 && currentCol > 0 && currentCol < 9) {
+
+            ChessPosition diagonalRight = new ChessPosition(currentRow + 1, currentCol+1);
+            if (diagonalRight.getRow() <= 8 && diagonalRight.getColumn() <= 8) {
                 ChessPiece diagonalRightPiece = board.getPiece(diagonalRight);
                 if (diagonalRightPiece != null && diagonalRightPiece.getTeamColor() != pieceColor) {
                     if(diagonalRight.getRow() != 8) {
@@ -47,18 +50,22 @@ public class PawnMovesCalculator {
                     }
                 }
             }
-            ChessPosition diagonalLeft = new ChessPosition(currentRow + 1, currentCol - 1);
-            if (currentRow > 0 && currentRow < 9 && currentCol > 0 && currentCol < 9) {
+            ChessPosition diagonalLeft = new ChessPosition(currentRow + 1, currentCol-1);
+            if (diagonalLeft.getRow() <= 8 && diagonalLeft.getColumn() <= 8) {
                 ChessPiece diagonalLeftPiece = board.getPiece(diagonalLeft);
                 if (diagonalLeftPiece != null && diagonalLeftPiece.getTeamColor() != pieceColor) {
                     if(diagonalRight.getRow() != 8) {
                         legalMoves.add(new ChessMove(position, diagonalLeft, null));
+                        System.out.println("(" + diagonalLeft.getRow() + ", " + diagonalLeft.getColumn() + ")");
+
                     }
                     if(diagonalLeft.getRow() == 8){
                         legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.BISHOP));
                         legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.QUEEN));
                         legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.KNIGHT));
                         legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.ROOK));
+                        System.out.println("(" + diagonalLeft.getRow() + ", " + diagonalLeft.getColumn() + ")");
+
                     }
 
                 }
@@ -82,12 +89,11 @@ public class PawnMovesCalculator {
                 }
             }
             ChessPosition newPosition = new ChessPosition(currentRow - 1, currentCol);
-            if (board.getPiece(newPosition) == null && newPosition.getRow() != 1) {
+            if (board.getPiece(newPosition) == null && newPosition.getRow() != 1 && newPosition.getRow() < 8) {
                 legalMoves.add(new ChessMove(position, newPosition, null));
-
             }
             ChessPosition diagonalRight = new ChessPosition(currentRow - 1, currentCol + 1);
-            if (currentRow > 0 && currentRow < 9 && currentCol > 0 && currentCol < 9) {
+            if (diagonalRight.getRow() >= 1 && diagonalRight.getColumn() >= 1) {
                 ChessPiece diagonalRightPiece = board.getPiece(diagonalRight);
                 if (diagonalRightPiece != null && diagonalRightPiece.getTeamColor() != pieceColor) {
                     if(diagonalRight.getRow() != 1) {
@@ -102,10 +108,10 @@ public class PawnMovesCalculator {
                 }
             }
             ChessPosition diagonalLeft = new ChessPosition(currentRow - 1, currentCol - 1);
-            if (currentRow > 0 && currentRow < 9 && currentCol > 0 && currentCol < 9) {
+            if (diagonalLeft.getRow() >= 1 && diagonalLeft.getColumn() >= 1) {
                 ChessPiece diagonalLeftPiece = board.getPiece(diagonalLeft);
                 if (diagonalLeftPiece != null && diagonalLeftPiece.getTeamColor() != pieceColor) {
-                    if(diagonalRight.getRow() != 1) {
+                    if(diagonalLeft.getRow() != 1) {
                         legalMoves.add(new ChessMove(position, diagonalLeft, null));
                     }
                     if(diagonalLeft.getRow() == 1){
