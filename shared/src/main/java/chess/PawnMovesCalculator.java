@@ -36,15 +36,30 @@ public class PawnMovesCalculator {
             if (currentRow > 0 && currentRow < 9 && currentCol > 0 && currentCol < 9) {
                 ChessPiece diagonalRightPiece = board.getPiece(diagonalRight);
                 if (diagonalRightPiece != null && diagonalRightPiece.getTeamColor() != pieceColor) {
-                    legalMoves.add(new ChessMove(position, diagonalRight, null));
-
+                    if(diagonalRight.getRow() != 8) {
+                        legalMoves.add(new ChessMove(position, diagonalRight, null));
+                    }
+                    if(diagonalRight.getRow() == 8){
+                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.BISHOP));
+                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.QUEEN));
+                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.KNIGHT));
+                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.ROOK));
+                    }
                 }
             }
             ChessPosition diagonalLeft = new ChessPosition(currentRow + 1, currentCol - 1);
             if (currentRow > 0 && currentRow < 9 && currentCol > 0 && currentCol < 9) {
                 ChessPiece diagonalLeftPiece = board.getPiece(diagonalLeft);
                 if (diagonalLeftPiece != null && diagonalLeftPiece.getTeamColor() != pieceColor) {
-                    legalMoves.add(new ChessMove(position, diagonalLeft, null));
+                    if(diagonalRight.getRow() != 8) {
+                        legalMoves.add(new ChessMove(position, diagonalLeft, null));
+                    }
+                    if(diagonalLeft.getRow() == 8){
+                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.BISHOP));
+                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.QUEEN));
+                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.KNIGHT));
+                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.ROOK));
+                    }
 
                 }
             }
@@ -53,6 +68,7 @@ public class PawnMovesCalculator {
                 legalMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.QUEEN));
                 legalMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.KNIGHT));
                 legalMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.ROOK));
+
             }
 
         } else {
@@ -74,14 +90,30 @@ public class PawnMovesCalculator {
             if (currentRow > 0 && currentRow < 9 && currentCol > 0 && currentCol < 9) {
                 ChessPiece diagonalRightPiece = board.getPiece(diagonalRight);
                 if (diagonalRightPiece != null && diagonalRightPiece.getTeamColor() != pieceColor) {
-                    legalMoves.add(new ChessMove(position, diagonalRight, null));
+                    if(diagonalRight.getRow() != 1) {
+                        legalMoves.add(new ChessMove(position, diagonalRight, null));
+                    }
+                    if(diagonalRight.getRow() == 1){
+                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.BISHOP));
+                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.QUEEN));
+                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.KNIGHT));
+                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.ROOK));
+                    }
                 }
             }
             ChessPosition diagonalLeft = new ChessPosition(currentRow - 1, currentCol - 1);
             if (currentRow > 0 && currentRow < 9 && currentCol > 0 && currentCol < 9) {
                 ChessPiece diagonalLeftPiece = board.getPiece(diagonalLeft);
                 if (diagonalLeftPiece != null && diagonalLeftPiece.getTeamColor() != pieceColor) {
-                    legalMoves.add(new ChessMove(position, diagonalLeft, null));
+                    if(diagonalRight.getRow() != 1) {
+                        legalMoves.add(new ChessMove(position, diagonalLeft, null));
+                    }
+                    if(diagonalLeft.getRow() == 1){
+                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.BISHOP));
+                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.QUEEN));
+                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.KNIGHT));
+                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.ROOK));
+                    }
                 }
             }
             if(newPosition.getRow() == 1){
