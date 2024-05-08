@@ -36,7 +36,7 @@ public class PawnMovesCalculator {
             }
 
             ChessPosition diagonalRight = new ChessPosition(currentRow + 1, currentCol+1);
-            if (diagonalRight.getRow() <= 8 && diagonalRight.getColumn() <= 8) {
+            if (diagonalRight.getRow() <= 8 && diagonalRight.getRow() >= 1 && diagonalRight.getColumn() >= 1 && diagonalRight.getColumn() <= 8) {
                 ChessPiece diagonalRightPiece = board.getPiece(diagonalRight);
                 if (diagonalRightPiece != null && diagonalRightPiece.getTeamColor() != pieceColor) {
                     if(diagonalRight.getRow() != 8) {
@@ -51,7 +51,7 @@ public class PawnMovesCalculator {
                 }
             }
             ChessPosition diagonalLeft = new ChessPosition(currentRow + 1, currentCol-1);
-            if (diagonalLeft.getRow() <= 8 && diagonalLeft.getColumn() <= 8) {
+            if (diagonalLeft.getRow() <= 8 && diagonalLeft.getRow() >= 1 && diagonalLeft.getColumn() >= 1 && diagonalLeft.getColumn() <= 8) {
                 ChessPiece diagonalLeftPiece = board.getPiece(diagonalLeft);
                 if (diagonalLeftPiece != null && diagonalLeftPiece.getTeamColor() != pieceColor) {
                     if(diagonalRight.getRow() != 8) {
@@ -93,7 +93,7 @@ public class PawnMovesCalculator {
                 legalMoves.add(new ChessMove(position, newPosition, null));
             }
             ChessPosition diagonalRight = new ChessPosition(currentRow - 1, currentCol + 1);
-            if (diagonalRight.getRow() >= 1 && diagonalRight.getColumn() >= 1) {
+            if (diagonalRight.getRow() <= 8 && diagonalRight.getRow() >= 1 && diagonalRight.getColumn() >= 1 && diagonalRight.getColumn() <= 8) {
                 ChessPiece diagonalRightPiece = board.getPiece(diagonalRight);
                 if (diagonalRightPiece != null && diagonalRightPiece.getTeamColor() != pieceColor) {
                     if(diagonalRight.getRow() != 1) {
@@ -108,7 +108,7 @@ public class PawnMovesCalculator {
                 }
             }
             ChessPosition diagonalLeft = new ChessPosition(currentRow - 1, currentCol - 1);
-            if (diagonalLeft.getRow() >= 1 && diagonalLeft.getColumn() >= 1) {
+            if (diagonalLeft.getRow() <= 8 && diagonalLeft.getRow() >= 1 && diagonalLeft.getColumn() >= 1 && diagonalLeft.getColumn() <= 8) {
                 ChessPiece diagonalLeftPiece = board.getPiece(diagonalLeft);
                 if (diagonalLeftPiece != null && diagonalLeftPiece.getTeamColor() != pieceColor) {
                     if(diagonalLeft.getRow() != 1) {
