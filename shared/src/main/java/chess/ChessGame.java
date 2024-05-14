@@ -9,16 +9,18 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
+    private TeamColor currentTeam;
+    private ChessBoard board;
 
     public ChessGame() {
-
+        currentTeam = null;
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return currentTeam;
     }
 
     /**
@@ -27,7 +29,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        currentTeam = team;
     }
 
     /**
@@ -46,7 +48,11 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+        if(piece == null){
+            return null;
+        }
+        return piece.pieceMoves(board, startPosition);
     }
 
     /**
@@ -56,7 +62,27 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        if(currentTeam != board.getPiece(move.getStartPosition()).getTeamColor()){
+            throw new InvalidMoveException("invalid move-wrong team");
+        }
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if(piece == null){
+            throw new InvalidMoveException("invalid move-no piece at start");
+        }
+        Collection<ChessMove> validMoves = piece.pieceMoves(board, move.getStartPosition());
+        if(!validMoves.contains(move)){
+            throw new InvalidMoveException("invalid move");
+        }
+        ChessPiece originalPiece = board.getPiece(move.getEndPosition());
+        board.addPiece(move.getEndPosition(), piece);
+        board.addPiece(move.getStartPosition(), null);
+
+        if(isInCheck(currentTeam)){
+            board.addPiece(move.getEndPosition(), piece);
+            board.addPiece(move.getStartPosition(), originalPiece);
+            throw new InvalidMoveException("King in danger");
+        }
+        currentTeam = (currentTeam == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
     /**
