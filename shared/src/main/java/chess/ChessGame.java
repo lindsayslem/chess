@@ -11,18 +11,20 @@ import java.util.Set;
  * signature of the existing methods.
  */
 public class ChessGame {
-    private TeamColor currentTeam;
+    private ChessGame.TeamColor pieceColor;
     private ChessBoard board;
 
     public ChessGame() {
-        currentTeam = null;
+        this.pieceColor = TeamColor.WHITE;
+        this.board = new ChessBoard();
+        this.board.resetBoard();
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return currentTeam;
+        return pieceColor;
     }
 
     /**
@@ -31,7 +33,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        currentTeam = team;
+        pieceColor = team;
     }
 
     /**
@@ -52,9 +54,9 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Set<ChessMove> validMoves = new HashSet<>();
         ChessPiece piece = board.getPiece(startPosition);
-        if(piece != null && piece.getTeamColor() == currentTeam){
+        if(piece != null && piece.getTeamColor() == pieceColor){
             validMoves.addAll(piece.pieceMoves(board, startPosition));
-            KingMovementRule kingMovementRule = new KingMovementRule(board, currentTeam);
+            KingMovementRule kingMovementRule = new KingMovementRule(board, pieceColor);
             for(ChessMove move : new HashSet<>(validMoves)){
                 if (kingMovementRule.isInCheck()) {
                     validMoves.remove(move);
@@ -71,8 +73,11 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if(currentTeam != board.getPiece(move.getStartPosition()).getTeamColor()){
-            throw new InvalidMoveException("invalid move-wrong team");
+        if(board == null){
+            throw new InvalidMoveException("Board not initialized");
+        }
+        if(pieceColor != board.getPiece(move.getStartPosition()).getTeamColor()){
+            throw new InvalidMoveException("invalid move - wrong team");
         }
         ChessPiece piece = board.getPiece(move.getStartPosition());
         if(piece == null){
@@ -86,12 +91,12 @@ public class ChessGame {
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
 
-        if(isInCheck(currentTeam)){
+        if(isInCheck(pieceColor)){
             board.addPiece(move.getEndPosition(), piece);
             board.addPiece(move.getStartPosition(), originalPiece);
             throw new InvalidMoveException("King in danger");
         }
-        currentTeam = (currentTeam == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        pieceColor = (pieceColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
     /**
