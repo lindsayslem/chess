@@ -56,7 +56,7 @@ public class ChessGame {
             validMoves.addAll(piece.pieceMoves(board, startPosition));
             KingMovementRule kingMovementRule = new KingMovementRule(board, currentTeam);
             for(ChessMove move : new HashSet<>(validMoves)){
-                if (kingMovementRule.leavesKingInCheck(move)) {
+                if (kingMovementRule.isInCheck()) {
                     validMoves.remove(move);
                 }
             }
@@ -101,7 +101,8 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        return KingInCheck.isKingInCheck(board, teamColor);
+        KingMovementRule kingMovementRule = new KingMovementRule(board, teamColor);
+        return kingMovementRule.isInCheck();
     }
 
     /**
@@ -111,7 +112,8 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return KingInCheckmate.KingInCheckmate(board, teamColor);
+        KingMovementRule kingMovementRule = new KingMovementRule(board, teamColor);
+        return kingMovementRule.isInCheckmate();
     }
 
     /**

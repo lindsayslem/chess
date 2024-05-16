@@ -10,15 +10,15 @@ public class KingMovementRule {
         this.board = board;
         this.currentTeam = currentTeam;
     }
-    public boolean isKingInCheck(ChessBoard board, ChessGame.TeamColor teamColor) {
-        ChessPosition kingPosition = findKingPosition(board, teamColor);
+    public boolean isInCheck() {
+        ChessPosition kingPosition = findKingPosition(currentTeam);
         if(kingPosition == null){
             return false;
         }
         for(int row = 0; row < 8; row++){
             for(int col = 0; col < 8; col++){
                 ChessPiece piece = board.getPiece(new ChessPosition(row +1, col+1));
-                if(piece != null && piece.getTeamColor() != teamColor){
+                if(piece != null && piece.getTeamColor() != currentTeam){
                     Collection<ChessMove> validMoves = piece.pieceMoves(board, new ChessPosition(row+1, col+1));
                     for(ChessMove move : validMoves){
                         if(move.getEndPosition().equals(kingPosition)){
@@ -30,18 +30,19 @@ public class KingMovementRule {
         }
         return false;
     }
-    public boolean KingInCheckmate(ChessBoard board, ChessGame.TeamColor teamColor){
-        if(!isKingInCheck(board, teamColor)){
+    public boolean isInCheckmate(){
+        if(!isInCheck()){
             return false;
         }
         for(int row = 0; row < 8; row++){
             for(int col = 0; col < 8; col++){
                 ChessPiece piece = board.getPiece(new ChessPosition(row +1, col+1));
-                if(piece != null && piece.getTeamColor() == teamColor){
+                if(piece != null && piece.getTeamColor() == currentTeam){
                     Collection<ChessMove> validMoves = piece.pieceMoves(board, new ChessPosition(row+1, col+1));
                     for(ChessMove move : validMoves){
                         ChessBoard copyBoard = copyBoard(board, move);
-                        if(!KingInCheck.isKingInCheck(copyBoard, teamColor)){
+                        KingMovementRule copyRule = new KingMovementRule(copyBoard, currentTeam);
+                        if(!copyRule.isInCheck()){
                             return false;
                         }
                     }
@@ -50,7 +51,7 @@ public class KingMovementRule {
         }
         return true;
     }
-    private static ChessPosition findKingPosition(ChessBoard board, ChessGame.TeamColor teamColor) {
+    private ChessPosition findKingPosition(ChessGame.TeamColor teamColor) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 ChessPiece piece = board.getPiece(new ChessPosition(row + 1, col + 1));
