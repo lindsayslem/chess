@@ -34,6 +34,10 @@ public class KingMovementRule {
         if(!isInCheck()){
             return false;
         }
+        return kingPositionIteration();
+    }
+
+    private boolean kingPositionIteration() {
         for(int row = 0; row < 8; row++){
             for(int col = 0; col < 8; col++){
                 ChessPiece piece = board.getPiece(new ChessPosition(row +1, col+1));
@@ -56,24 +60,7 @@ public class KingMovementRule {
         if(isInCheck()){
             return false;
         }
-        for(int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                ChessPiece piece = board.getPiece(new ChessPosition(row + 1, col + 1));
-                if(piece !=  null && piece.getTeamColor() == currentTeam){
-                    Collection<ChessMove> validMoves = piece.pieceMoves(board, new ChessPosition(row + 1, col + 1));
-                    for(ChessMove move: validMoves) {
-                        ChessBoard copyBoard = copyBoard(board, move);
-                        KingMovementRule copyRule = new KingMovementRule(copyBoard, currentTeam);
-                        if (!copyRule.isInCheck()) {
-                            return false;
-                        }
-
-                    }
-
-                }
-            }
-        }
-        return true;
+        return kingPositionIteration();
     }
 
 
@@ -97,7 +84,14 @@ public class KingMovementRule {
                 newBoard.addPiece(new ChessPosition(row +1, col+1), board.getPiece(new ChessPosition(row+1,col+1)));
             }
         }
-        newBoard.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+        ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
+        if(promotionPiece != null && promotionPiece != ChessPiece.PieceType.PAWN){
+            newBoard.addPiece(move.getEndPosition(), new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(), promotionPiece));
+        }
+        else{
+            newBoard.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+
+        }
         newBoard.addPiece(move.getStartPosition(), null);
         return newBoard;
     }

@@ -76,12 +76,13 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = board.getPiece(move.getStartPosition());
+        if(piece == null){
+            throw new InvalidMoveException("start is null");
+        }
         if(pieceColor != piece.getTeamColor()){
             throw new InvalidMoveException("invalid move - wrong team");
         }
-        if(piece == null){
-            throw new InvalidMoveException("invalid move-no piece at start");
-        }
+
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         if(!validMoves.contains(move)){
             throw new InvalidMoveException("invalid move");
