@@ -58,8 +58,12 @@ public class KingMovementRule {
                 ChessPiece piece = board.getPiece(new ChessPosition(row + 1, col + 1));
                 if(piece !=  null && piece.getTeamColor() == currentTeam){
                     Collection<ChessMove> validMoves = piece.pieceMoves(board, new ChessPosition(row + 1, col + 1));
-                    if(!validMoves.isEmpty()){
-                        return false;
+                    for(ChessMove move: validMoves){
+                        ChessBoard copyBoard = copyBoard(board, move);
+                        KingMovementRule copyRule = new KingMovementRule(copyBoard, currentTeam);
+                        if(!copyRule.isInCheck()) {
+                            return false;
+                        }
                     }
                 }
             }
