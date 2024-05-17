@@ -53,18 +53,23 @@ public class KingMovementRule {
     }
 
     public boolean isInStalemate(){
+        if(isInCheck()){
+            return false;
+        }
         for(int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 ChessPiece piece = board.getPiece(new ChessPosition(row + 1, col + 1));
                 if(piece !=  null && piece.getTeamColor() == currentTeam){
                     Collection<ChessMove> validMoves = piece.pieceMoves(board, new ChessPosition(row + 1, col + 1));
-                    for(ChessMove move: validMoves){
+                    for(ChessMove move: validMoves) {
                         ChessBoard copyBoard = copyBoard(board, move);
                         KingMovementRule copyRule = new KingMovementRule(copyBoard, currentTeam);
-                        if(!copyRule.isInCheck()) {
+                        if (!copyRule.isInCheck()) {
                             return false;
                         }
+
                     }
+
                 }
             }
         }
@@ -85,7 +90,7 @@ public class KingMovementRule {
     }
 
 
-    private ChessBoard copyBoard(ChessBoard board, ChessMove move){
+    public ChessBoard copyBoard(ChessBoard board, ChessMove move){
         ChessBoard newBoard = new ChessBoard();
         for(int row = 0; row < 8; row++){
             for(int col = 0; col < 8; col++) {
