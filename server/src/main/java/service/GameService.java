@@ -1,52 +1,55 @@
 package service;
 
-import chess.ChessGame;
-import dataaccess.DataAccessException;
-import dataaccess.DataAccess;
-import model.GameData;
+import dataAccess.GameDataDAO;
+import dataAccess.AuthDataDAO;
+import dataAccess.DataAccessException;
 import model.AuthData;
+import model.GameData;
+import chess.ChessGame;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class GameService {
-    private final DataAccess dao;
+    private final GameDataDAO gameDataDAO;
+    private final AuthDataDAO authDataDAO;
 
-    public GameService(DataAccess dao) {
-        this.dao = dao;
+    public GameService(GameDataDAO gameDataDAO, AuthDataDAO authDataDAO) {
+        this.gameDataDAO = gameDataDAO;
+        this.authDataDAO = authDataDAO;
     }
 
     public GameData createGame(GameData gameData, String authToken) throws DataAccessException {
-        AuthData authData = dao.getAuth(authToken);
-        if (authData == null) {
-            throw new DataAccessException("Unauthorized");
-        }
-        gameData.setGameID(dao.getNextGameID());
-        dao.createGame(gameData);
-        return gameData;
+        AuthData authData = authDataDAO.getAuth(authToken);
+        GameData createdGame = gameDataDAO.createGame(gameData.gameName());
+
+        createdGame = new GameData(createdGame.gameID(), authData.username(), createdGame.blackUsername(), createdGame.gameName(), new ChessGame());
+        gameDataDAO.updateGame(createdGame);
+
+        return createdGame;
     }
 
-    public boolean joinGame(GameData gameData, String authToken) throws DataAccessException {
-        GameData existingGame = dao.getGame(gameData.getGameID());
-        AuthData authData = dao.getAuth(authToken);
-        if (existingGame == null || authData == null) {
-            throw new DataAccessException("Game or user not found");
+    public void joinGame(GameData gameData, String authToken) throws DataAccessException {
+        GameData existingGame = gameDataDAO.getGame(gameData.gameID());
+        AuthData authData = authDataDAO.getAuth(authToken);
+        GameData updatedGame;
+        if(gameData.whiteUsername() != null && gameData.whiteUsername().equals(authData.username())){
+            updatedGame = new GameData(existingGame.gameID(), authData.username(), existingGame.blackUsername(), existingGame.gameName(), existingGame.game());
         }
-        if (gameData.getWhiteUsername() != null && existingGame.getWhiteUsername() == null) {
-            existingGame.setWhiteUsername(authData.getUsername());
-        } else if (gameData.getBlackUsername() != null && existingGame.getBlackUsername() == null) {
-            existingGame.setBlackUsername(authData.getUsername());
-        } else {
-            return false; // Color is already taken or invalid request
+        else if(gameData.blackUsername() != null && gameData.blackUsername().equals(authData.username())){
+            updatedGame = new GameData(existingGame.gameID(), existingGame.whiteUsername(), authData.username(), existingGame.gameName(), existingGame.game());
         }
-        dao.updateGame(existingGame);
-        return true;
+        else{
+            throw new DataAccessException("Invalid player color");
+        }
+        gameDataDAO.updateGame(updatedGame);
     }
 
     public List<GameData> listGames(String authToken) throws DataAccessException {
-        AuthData authData = dao.getAuth(authToken);
-        if (authData == null) {
-            throw new DataAccessException("Unauthorized");
-        }
-        return dao.listGames();
+        authDataDAO.getAuth(authToken);
+
+        Map<Integer, GameData> games = gameDataDAO.listGames();
+        return games.values().stream().collect(Collectors.toList());
     }
 }

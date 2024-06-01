@@ -1,42 +1,51 @@
 package service;
 
-import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
-import model.UserData;
+import dataAccess.AuthDataDAO;
+import dataAccess.UserDataDAO;
+import dataAccess.DataAccessException;
 import model.AuthData;
+import model.UserData;
+import java.util.UUID;
 
 public class UserService {
+    private final UserDataDAO userDataDAO;
+    private final AuthDataDAO authDataDAO;
 
-    private final DataAccess dataAccess;
-
-    public UserService(DataAccess dataAccess) {
-        this.dataAccess = dataAccess;
+    public UserService(UserDataDAO userDataDAO, AuthDataDAO authDataDAO) {
+        this.userDataDAO = userDataDAO;
+        this.authDataDAO = authDataDAO;
     }
 
     public AuthData register(UserData user) throws DataAccessException {
-        if (dataAccess.getUser(user.getUsername()) != null || dataAccess.getUserByEmail(user.getEmail()) != null) {
-            return null;
+        try{
+            userDataDAO.getUser(user.username());
+            throw new DataAccessException("Username already taken");
         }
-        dataAccess.insertUser(user);
-        String authToken = dataAccess.createAuth(user.getUsername());
-        return new AuthData(authToken, user.getUsername());
+        catch(DataAccessException e){
+        }
+        userDataDAO.createUser(user);
+
+        String authToken = UUID.randomUUID().toString();
+        AuthData authData = new AuthData(authToken, user.username());
+        authDataDAO.createAuth(authData);
+
+        return authData;
     }
 
     public AuthData login(UserData user) throws DataAccessException {
-        UserData storedUser = dataAccess.getUser(user.getUsername());
-        if (storedUser == null || !storedUser.getPassword().equals(user.getPassword())) {
-            return null;
+        UserData storedUser = userDataDAO.getUser(user.username());
+        if(!storedUser.password().equals(user.password())){
+            throw new DataAccessException("Unauthorized");
         }
-        String authToken = dataAccess.createAuth(user.getUsername());
-        return new AuthData(authToken, user.getUsername());
+
+        String authToken = UUID.randomUUID().toString();
+        AuthData authData = new AuthData(authToken, user.username());
+        authDataDAO.createAuth(authData);
+
+        return authData;
     }
 
-    public boolean logout(String authToken) throws DataAccessException {
-        AuthData authData = dataAccess.getAuth(authToken);
-        if (authData == null) {
-            return false;
-        }
-        dataAccess.deleteAuth(authToken);
-        return true;
+    public void logout(String authToken) throws DataAccessException {
+        authDataDAO.deleteAuth(authToken);
     }
 }
