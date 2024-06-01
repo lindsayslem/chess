@@ -4,10 +4,12 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 import service.ClearService;
-import dataaccess.DataAccessException;
+import dataAccess.DataAccessException;
+import com.google.gson.Gson;
 
 public class ClearHandler implements Route {
     private final ClearService clearService;
+    private final Gson gson = new Gson();
 
     public ClearHandler(ClearService clearService) {
         this.clearService = clearService;
@@ -21,7 +23,7 @@ public class ClearHandler implements Route {
             return "{}";
         } catch (DataAccessException e) {
             response.status(500);
-            return "{\"message\": \"Error: internal server error\"}";
+            return gson.toJson(new Error("Error"));
         }
     }
 }

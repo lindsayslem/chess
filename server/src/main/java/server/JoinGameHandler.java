@@ -6,10 +6,11 @@ import spark.Response;
 import spark.Route;
 import service.GameService;
 import model.GameData;
-import dataaccess.DataAccessException;
+import dataAccess.DataAccessException;
 
 public class JoinGameHandler implements Route {
     private final GameService gameService;
+    private final Gson gson = new Gson();
 
     public JoinGameHandler(GameService gameService) {
         this.gameService = gameService;
@@ -17,20 +18,10 @@ public class JoinGameHandler implements Route {
 
     @Override
     public Object handle(Request request, Response response) {
-        Gson gson = new Gson();
         try {
             String authToken = request.headers("authorization");
-            if (authToken == null || authToken.isEmpty()) {
-                response.status(401);
-                return gson.toJson(new Error("Error: unauthorized"));
-            }
-
             GameData joinGameRequest = gson.fromJson(request.body(), GameData.class);
-            boolean success = gameService.joinGame(joinGameRequest, authToken);
-            if (!success) {
-                response.status(400);
-                return gson.toJson(new Error("Error: bad request"));
-            }
+            gameService.joinGame(joinGameRequest, authToken);
             response.status(200);
             return "{}";
         } catch (DataAccessException e) {

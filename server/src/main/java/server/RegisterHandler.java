@@ -8,9 +8,12 @@ import spark.Route;
 import service.UserService;
 import model.UserData;
 import model.AuthData;
+import dataAccess.DataAccessException;
+
 
 public class RegisterHandler implements Route {
     private final UserService userService;
+    private final Gson gson = new Gson();
 
     public RegisterHandler(UserService userService) {
         this.userService = userService;
@@ -18,17 +21,16 @@ public class RegisterHandler implements Route {
 
     @Override
     public Object handle(Request request, Response response) {
-        Gson gson = new Gson();
         try {
             UserData userData = gson.fromJson(request.body(), UserData.class);
             AuthData authData = userService.register(userData);
-            if (authData == null) {
-                response.status(403);
-                return gson.toJson(new Error("Error: already taken"));
-            }
             response.status(200);
             return gson.toJson(authData);
-        } catch (Exception e) {
+        }
+        catch(DataAccessException e){
+            response.status(403);
+            return gson.toJson(new Error("Error: already taken"));
+        } catch(Exception e) {
             response.status(400);
             return gson.toJson(new Error("Error: bad request"));
         }
