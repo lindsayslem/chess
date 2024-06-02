@@ -21,10 +21,14 @@ public class ClearHandler implements Route {
         try {
             clearService.clear();
             response.status(200);
-            return "{}";
+            return gson.toJson(new Object());
         } catch (DataAccessException e) {
             response.status(500);
             return gson.toJson(new Error("Error"));
         }
+        catch (Exception e) {
+            response.status(500);
+            return gson.toJson(new Error("Error: internal server error"));
+    }
     }
 }

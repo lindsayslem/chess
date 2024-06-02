@@ -28,10 +28,10 @@ public class GameDataDAO implements IGameDataDAO {
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-        if (!gameDataMap.containsKey(game.gameID())) {
+        if (!gameDataMap.containsKey(game.getGameID())) {
             throw new DataAccessException("Game not found.");
         }
-        gameDataMap.put(game.gameID(), game);
+        gameDataMap.put(game.getGameID(), game);
     }
 
     @Override

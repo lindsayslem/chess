@@ -22,10 +22,15 @@ public class ListGamesHandler implements Route {
     public Object handle(Request request, Response response) {
         try {
             String authToken = request.headers("authorization");
+            // Check if the auth token is present and valid
+            if (authToken == null || authToken.isEmpty()) {
+                response.status(401);
+                return gson.toJson(new Error("Error: unauthorized"));
+            }
             List<GameData> games = gameService.listGames(authToken);
             response.status(200);
-            return gson.toJson(games);
-        } catch (DataAccessException e) {
+            return gson.toJson(games); // Returning a JSON array
+        }  catch (DataAccessException e) {
             response.status(401);
             return gson.toJson(new Error("Error: unauthorized"));
         } catch (Exception e) {

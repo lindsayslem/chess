@@ -7,9 +7,9 @@ import model.AuthData;
 import model.GameData;
 import chess.ChessGame;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class GameService {
     private final GameDataDAO gameDataDAO;
@@ -25,14 +25,14 @@ public class GameService {
         AuthData authData = authDataDAO.getAuth(authToken);
 
         // Create game
-        GameData createdGame = gameDataDAO.createGame(gameData.gameName());
+        GameData createdGame = gameDataDAO.createGame(gameData.getGameName());
 
         // Assign user to the game
         createdGame = new GameData(
-                createdGame.gameID(),
-                authData.username(),
-                createdGame.blackUsername(),
-                createdGame.gameName(),
+                createdGame.getGameID(),
+                authData.getUsername(),
+                createdGame.getBlackUsername(),
+                createdGame.getGameName(),
                 new ChessGame()
         );
         gameDataDAO.updateGame(createdGame);
@@ -40,44 +40,34 @@ public class GameService {
         return createdGame;
     }
 
-    public void joinGame(GameData gameData, String authToken) throws DataAccessException {
-        // Validate auth token
+    public boolean joinGame(ChessGame.TeamColor playerColor, Integer gameID, String authToken) throws DataAccessException {
+        GameData gameData = gameDataDAO.getGame(gameID);
         AuthData authData = authDataDAO.getAuth(authToken);
 
-        // Get game
-        GameData existingGame = gameDataDAO.getGame(gameData.gameID());
-
-        // Assign user to the game
-        GameData updatedGame;
-        if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(authData.username())) {
-            updatedGame = new GameData(
-                    existingGame.gameID(),
-                    authData.username(),
-                    existingGame.blackUsername(),
-                    existingGame.gameName(),
-                    existingGame.game()
-            );
-        } else if (gameData.blackUsername() != null && gameData.blackUsername().equals(authData.username())) {
-            updatedGame = new GameData(
-                    existingGame.gameID(),
-                    existingGame.whiteUsername(),
-                    authData.username(),
-                    existingGame.gameName(),
-                    existingGame.game()
-            );
+        if (playerColor == ChessGame.TeamColor.WHITE) {
+            if (gameData.getWhiteUsername() != null) {
+                return false;
+            }
+            gameData.setWhiteUsername(authData.getUsername());
+        } else if (playerColor == ChessGame.TeamColor.BLACK) {
+            if (gameData.getBlackUsername() != null) {
+                return false;
+            }
+            gameData.setBlackUsername(authData.getUsername());
         } else {
-            throw new DataAccessException("Invalid player color");
+            throw new DataAccessException("Invalid team color");
         }
 
-        gameDataDAO.updateGame(updatedGame);
+        gameDataDAO.updateGame(gameData);
+        return true;
     }
 
     public List<GameData> listGames(String authToken) throws DataAccessException {
-        // Validate auth token
-        authDataDAO.getAuth(authToken);
-
-        // List all games
-        Map<Integer, GameData> games = gameDataDAO.listGames();
-        return games.values().stream().collect(Collectors.toList());
+        AuthData authData = authDataDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        Map<Integer, GameData> gamesMap = gameDataDAO.listGames();
+        return new ArrayList<>(gamesMap.values());
     }
 }
