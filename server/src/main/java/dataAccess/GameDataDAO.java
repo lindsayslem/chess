@@ -5,7 +5,7 @@ import model.GameData;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GameDataDAO implements IGameDataDAO{
+public class GameDataDAO implements IGameDataDAO {
     private final Map<Integer, GameData> gameDataMap = new HashMap<>();
     private int nextGameID = 1;
 
@@ -20,15 +20,15 @@ public class GameDataDAO implements IGameDataDAO{
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
         GameData gameData = gameDataMap.get(gameID);
-        if(gameData == null){
-            throw new DataAccessException("Game not found");
+        if (gameData == null) {
+            throw new DataAccessException("Game not found.");
         }
         return gameData;
     }
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-        if(!gameDataMap.containsKey(game.gameID())){
+        if (!gameDataMap.containsKey(game.gameID())) {
             throw new DataAccessException("Game not found.");
         }
         gameDataMap.put(game.gameID(), game);
