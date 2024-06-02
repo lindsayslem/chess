@@ -6,6 +6,7 @@ import spark.Route;
 import service.UserService;
 import dataAccess.DataAccessException;
 import com.google.gson.Gson;
+import model.Error;
 
 public class LogoutHandler implements Route {
     private final UserService userService;

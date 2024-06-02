@@ -8,8 +8,7 @@ import service.GameService;
 import model.GameData;
 import dataAccess.DataAccessException;
 import java.util.List;
-
-
+import model.Error;
 
 public class ListGamesHandler implements Route {
     private final GameService gameService;

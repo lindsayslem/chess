@@ -9,6 +9,7 @@ import service.UserService;
 import model.UserData;
 import model.AuthData;
 import dataAccess.DataAccessException;
+import model.Error;
 
 
 public class RegisterHandler implements Route {
@@ -23,6 +24,10 @@ public class RegisterHandler implements Route {
     public Object handle(Request request, Response response) {
         try {
             UserData userData = gson.fromJson(request.body(), UserData.class);
+            if(userData.username() == null || userData.password() == null || userData.email() == null){
+                response.status(400);
+                return gson.toJson(new Error("missing field"));
+            }
             AuthData authData = userService.register(userData);
             response.status(200);
             return gson.toJson(authData);

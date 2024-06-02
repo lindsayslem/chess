@@ -6,6 +6,7 @@ import spark.Route;
 import service.ClearService;
 import dataAccess.DataAccessException;
 import com.google.gson.Gson;
+import model.Error;
 
 public class ClearHandler implements Route {
     private final ClearService clearService;

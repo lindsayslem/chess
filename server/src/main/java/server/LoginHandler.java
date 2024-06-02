@@ -8,6 +8,7 @@ import service.UserService;
 import model.AuthData;
 import model.UserData;
 import dataAccess.DataAccessException;
+import model.Error;
 
 public class LoginHandler implements Route {
     private final UserService userService;
