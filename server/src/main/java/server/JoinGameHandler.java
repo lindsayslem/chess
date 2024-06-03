@@ -30,7 +30,21 @@ public class JoinGameHandler implements Route {
             }
 
             JsonObject jsonObject = JsonParser.parseString(request.body()).getAsJsonObject();
-            ChessGame.TeamColor playerColor = ChessGame.TeamColor.valueOf(jsonObject.get("playerColor").getAsString());
+
+            if (!jsonObject.has("playerColor") || !jsonObject.has("gameID")) {
+                response.status(400);
+                return gson.toJson(new Error("Error: bad request"));
+            }
+
+            String playerColorStr = jsonObject.get("playerColor").getAsString();
+            ChessGame.TeamColor playerColor;
+            try {
+                playerColor = ChessGame.TeamColor.valueOf(playerColorStr);
+            } catch (IllegalArgumentException e) {
+                response.status(400);
+                return gson.toJson(new Error("Error: bad request"));
+            }
+
             Integer gameID = jsonObject.has("gameID") ? jsonObject.get("gameID").getAsInt() : null;
 
             if (gameID == null) {
@@ -48,9 +62,6 @@ public class JoinGameHandler implements Route {
                 return gson.toJson(new Error("Error: already taken"));
             }
 
-        } catch (IllegalArgumentException e) {
-            response.status(400);
-            return gson.toJson(new Error("Error: bad request"));
         } catch (DataAccessException e) {
             response.status(401);
             return gson.toJson(new Error("Error: unauthorized"));
