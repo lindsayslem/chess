@@ -7,9 +7,7 @@ import model.AuthData;
 import model.GameData;
 import chess.ChessGame;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameService {
     private final GameDataDAO gameDataDAO;
@@ -27,15 +25,7 @@ public class GameService {
         // Create game
         GameData createdGame = gameDataDAO.createGame(gameData.getGameName());
 
-        // Assign user to the game
-        createdGame = new GameData(
-                createdGame.getGameID(),
-                authData.getUsername(),
-                createdGame.getBlackUsername(),
-                createdGame.getGameName(),
-                new ChessGame()
-        );
-        gameDataDAO.updateGame(createdGame);
+
 
         return createdGame;
     }
@@ -75,6 +65,10 @@ public class GameService {
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized");
         }
-        return gameDataDAO.listGames();
+        Map<Integer, GameData> gamesMap = gameDataDAO.listGames();
+        if(gamesMap == null){
+            return Collections.emptyMap();
+        }
+        return gamesMap;
     }
 }

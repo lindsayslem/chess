@@ -30,7 +30,7 @@ public class ListGamesHandler implements Route {
             }
             Map<Integer, GameData> games = gameService.listGames(authToken);
             response.status(200);
-            return gson.toJson(games); // Returning a JSON array
+            return gson.toJson(Map.of("games", games.values()));
         }  catch (DataAccessException e) {
             response.status(401);
             return gson.toJson(new Error("Error: unauthorized"));
