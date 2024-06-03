@@ -40,34 +40,41 @@ public class GameService {
         return createdGame;
     }
 
-    public boolean joinGame(ChessGame.TeamColor playerColor, Integer gameID, String authToken) throws DataAccessException {
-        GameData gameData = gameDataDAO.getGame(gameID);
+    public boolean joinGame(ChessGame.TeamColor playerColor, int gameID, String authToken) throws DataAccessException {
         AuthData authData = authDataDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new DataAccessException("Unauthorized");
+        }
 
+        GameData gameData = gameDataDAO.getGame(gameID);
+        if (gameData == null) {
+            throw new DataAccessException("Bad request");
+        }
+
+        String username = authData.getUsername();
         if (playerColor == ChessGame.TeamColor.WHITE) {
             if (gameData.getWhiteUsername() != null) {
                 return false;
             }
-            gameData.setWhiteUsername(authData.getUsername());
+            gameData.setWhiteUsername(username);
         } else if (playerColor == ChessGame.TeamColor.BLACK) {
             if (gameData.getBlackUsername() != null) {
                 return false;
             }
-            gameData.setBlackUsername(authData.getUsername());
+            gameData.setBlackUsername(username);
         } else {
-            throw new DataAccessException("Invalid team color");
+            throw new DataAccessException("Bad request");
         }
 
         gameDataDAO.updateGame(gameData);
         return true;
     }
 
-    public List<GameData> listGames(String authToken) throws DataAccessException {
+    public Map<Integer, GameData> listGames(String authToken) throws DataAccessException {
         AuthData authData = authDataDAO.getAuth(authToken);
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized");
         }
-        Map<Integer, GameData> gamesMap = gameDataDAO.listGames();
-        return new ArrayList<>(gamesMap.values());
+        return gameDataDAO.listGames();
     }
 }

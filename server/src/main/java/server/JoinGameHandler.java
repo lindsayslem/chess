@@ -45,12 +45,7 @@ public class JoinGameHandler implements Route {
                 return gson.toJson(new Error("Error: bad request"));
             }
 
-            Integer gameID = jsonObject.has("gameID") ? jsonObject.get("gameID").getAsInt() : null;
-
-            if (gameID == null) {
-                response.status(400);
-                return gson.toJson(new Error("Error: bad request"));
-            }
+            int gameID = jsonObject.get("gameID").getAsInt();
 
             boolean joinSuccessful = gameService.joinGame(playerColor, gameID, authToken);
 

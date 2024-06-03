@@ -7,7 +7,8 @@ import spark.Route;
 import service.GameService;
 import model.GameData;
 import dataAccess.DataAccessException;
-import java.util.List;
+import java.util.Map;
+
 import model.Error;
 
 public class ListGamesHandler implements Route {
@@ -27,7 +28,7 @@ public class ListGamesHandler implements Route {
                 response.status(401);
                 return gson.toJson(new Error("Error: unauthorized"));
             }
-            List<GameData> games = gameService.listGames(authToken);
+            Map<Integer, GameData> games = gameService.listGames(authToken);
             response.status(200);
             return gson.toJson(games); // Returning a JSON array
         }  catch (DataAccessException e) {
