@@ -26,7 +26,7 @@ public class RegisterHandler implements Route {
             UserData userData = gson.fromJson(request.body(), UserData.class);
             if(userData.getUsername() == null || userData.getPassword() == null || userData.getEmail() == null){
                 response.status(400);
-                return gson.toJson(new Error("missing field"));
+                return gson.toJson(new Error("Error: bad request"));
             }
             AuthData authData = userService.register(userData);
             response.status(200);
@@ -36,7 +36,7 @@ public class RegisterHandler implements Route {
             response.status(403);
             return gson.toJson(new Error("Error: already taken"));
         } catch(Exception e) {
-            response.status(400);
+            response.status(500);
             return gson.toJson(new Error("Error: bad request"));
         }
     }

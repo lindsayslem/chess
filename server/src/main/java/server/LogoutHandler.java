@@ -26,10 +26,10 @@ public class LogoutHandler implements Route {
         }
         catch (DataAccessException e){
             response.status(401);
-            return gson.toJson(new Error("unauthorized"));
+            return gson.toJson(new Error("Error: unauthorized"));
         }
         catch (Exception e) {
             response.status(500);
-            return gson.toJson(new Error("internal server error"));        }
+            return gson.toJson(new Error("Error: internal server error"));        }
     }
 }
