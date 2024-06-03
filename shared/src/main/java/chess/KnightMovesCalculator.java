@@ -18,6 +18,10 @@ public class KnightMovesCalculator {
 
         int[][] moves = {{2, 1}, {1, 2}, {-1, 2}, {-2, 1}, {-2, -1}, {-1, -2}, {1, -2}, {2, -1}};
 
+        return KingAndKnightMovements(position, legalMoves, moves, board, pieceColor);
+    }
+
+    static Collection<ChessMove> KingAndKnightMovements(ChessPosition position, List<ChessMove> legalMoves, int[][] moves, ChessBoard board, ChessGame.TeamColor pieceColor) {
         for (int[] move : moves) {
             int rowDirection = move[0];
             int colDirection = move[1];
@@ -28,7 +32,6 @@ public class KnightMovesCalculator {
             if (currentRow > 0 && currentRow <= 8 && currentCol > 0 && currentCol <= 8) {
                 ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
                 ChessPiece newPositionPiece = board.getPiece(newPosition);
-
 
 
                 if (newPositionPiece == null) {

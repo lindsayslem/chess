@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collection;
 
+import static chess.KnightMovesCalculator.KingAndKnightMovements;
+
 public class KingMovesCalculator {
 
     private final ChessGame.TeamColor pieceColor;
@@ -17,28 +19,7 @@ public class KingMovesCalculator {
 
         int[][] moves = {{1, 0}, {1, 1}, {0, 1}, {-1, 1},{-1, 0}, {-1, -1}, {0, -1}, {1, -1}};
 
-        for(int[] move : moves){
-            int rowDirection = move[0];
-            int colDirection = move[1];
-
-            int currentRow = position.getRow() + rowDirection;
-            int currentCol = position.getColumn() + colDirection;
-
-            if(currentRow > 0 && currentRow <= 8 && currentCol > 0 && currentCol <=8) {
-                ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
-                ChessPiece newPositionPiece = board.getPiece(newPosition);
-
-
-                if (newPositionPiece == null) {
-                    legalMoves.add(new ChessMove(position, newPosition, null));
-                } else {
-                    if (newPositionPiece.getTeamColor() != pieceColor) {
-                        legalMoves.add(new ChessMove(position, newPosition, null));
-                    }
-                }
-            }
-        }
-        return legalMoves;
+        return KingAndKnightMovements(position, legalMoves, moves, board, pieceColor);
     }
 
 }
