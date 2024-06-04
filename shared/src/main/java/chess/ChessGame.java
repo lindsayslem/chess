@@ -199,7 +199,7 @@ public class ChessGame {
         }
         ChessPiece movingPiece = board.getPiece(move.getStartPosition());
         if(movingPiece != null){
-            if(move.getStartPosition() != null) {
+            if(move.getPromotionPiece() != null) {
                 newBoard.addPiece(move.getEndPosition(), new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece()));
             }
             else{

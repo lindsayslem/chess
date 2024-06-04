@@ -13,7 +13,7 @@ public class ChessBoard {
     private final ChessPiece[][] squares = new ChessPiece [8][8];
 
     public ChessBoard() {
-        
+
     }
 
     @Override
@@ -83,6 +83,5 @@ public class ChessBoard {
         squares[7][5] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
         squares[7][6] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
         squares[7][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
-        }
+    }
 }
-
