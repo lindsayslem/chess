@@ -147,6 +147,6 @@ public class ValidMovesTests {
                 {1, 5}, {1, 6}, {1, 7}, {2, 5}, {2, 7},
         });
         assertMoves(game, validMoves, position);
-        //trying to push to github
+
     }
 }

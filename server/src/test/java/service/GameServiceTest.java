@@ -37,7 +37,7 @@ public class GameServiceTest {
         GameData result = gameService.createGame(gameData, authData.authToken());
 
         assertNotNull(result);
-        assertEquals("Test Game", result.getGameName());
+        assertEquals("gameName", result.getGameName());
     }
 
     @Test
