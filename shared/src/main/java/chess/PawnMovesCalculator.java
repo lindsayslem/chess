@@ -42,12 +42,7 @@ public class PawnMovesCalculator {
                     if(diagonalRight.getRow() != 8) {
                         legalMoves.add(new ChessMove(position, diagonalRight, null));
                     }
-                    if(diagonalRight.getRow() == 8){
-                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.BISHOP));
-                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.QUEEN));
-                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.KNIGHT));
-                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.ROOK));
-                    }
+                    edgeEightCondition(position, legalMoves, diagonalRight);
                 }
             }
             ChessPosition diagonalLeft = new ChessPosition(currentRow + 1, currentCol-1);
@@ -60,23 +55,14 @@ public class PawnMovesCalculator {
 
                     }
                     if(diagonalLeft.getRow() == 8){
-                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.BISHOP));
-                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.QUEEN));
-                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.KNIGHT));
-                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.ROOK));
+                        diagonalLeftPromotion(position, legalMoves, diagonalLeft);
                         System.out.println("(" + diagonalLeft.getRow() + ", " + diagonalLeft.getColumn() + ")");
 
                     }
 
                 }
             }
-            if(newPosition.getRow() == 8){
-                legalMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.BISHOP));
-                legalMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.QUEEN));
-                legalMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.KNIGHT));
-                legalMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.ROOK));
-
-            }
+            edgeEightCondition(position, legalMoves, newPosition);
 
         } else {
             if (currentRow == 7) {
@@ -93,43 +79,41 @@ public class PawnMovesCalculator {
                 legalMoves.add(new ChessMove(position, newPosition, null));
             }
             ChessPosition diagonalRight = new ChessPosition(currentRow - 1, currentCol + 1);
-            if (diagonalRight.getRow() <= 8 && diagonalRight.getRow() >= 1 && diagonalRight.getColumn() >= 1 && diagonalRight.getColumn() <= 8) {
-                ChessPiece diagonalRightPiece = board.getPiece(diagonalRight);
-                if (diagonalRightPiece != null && diagonalRightPiece.getTeamColor() != pieceColor) {
-                    if(diagonalRight.getRow() != 1) {
-                        legalMoves.add(new ChessMove(position, diagonalRight, null));
-                    }
-                    if(diagonalRight.getRow() == 1){
-                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.BISHOP));
-                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.QUEEN));
-                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.KNIGHT));
-                        legalMoves.add(new ChessMove(position, diagonalRight, ChessPiece.PieceType.ROOK));
-                    }
-                }
-            }
+            diagonalEdgeCondition(position, legalMoves, diagonalRight);
             ChessPosition diagonalLeft = new ChessPosition(currentRow - 1, currentCol - 1);
-            if (diagonalLeft.getRow() <= 8 && diagonalLeft.getRow() >= 1 && diagonalLeft.getColumn() >= 1 && diagonalLeft.getColumn() <= 8) {
-                ChessPiece diagonalLeftPiece = board.getPiece(diagonalLeft);
-                if (diagonalLeftPiece != null && diagonalLeftPiece.getTeamColor() != pieceColor) {
-                    if(diagonalLeft.getRow() != 1) {
-                        legalMoves.add(new ChessMove(position, diagonalLeft, null));
-                    }
-                    if(diagonalLeft.getRow() == 1){
-                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.BISHOP));
-                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.QUEEN));
-                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.KNIGHT));
-                        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.ROOK));
-                    }
-                }
-            }
+            diagonalEdgeCondition(position, legalMoves, diagonalLeft);
             if(newPosition.getRow() == 1){
-                legalMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.BISHOP));
-                legalMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.QUEEN));
-                legalMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.KNIGHT));
-                legalMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.ROOK));
+                diagonalLeftPromotion(position, legalMoves, newPosition);
             }
         }
 
         return legalMoves;
+    }
+
+    private void diagonalEdgeCondition(ChessPosition position, List<ChessMove> legalMoves, ChessPosition diagonalRight) {
+        if (diagonalRight.getRow() <= 8 && diagonalRight.getRow() >= 1 && diagonalRight.getColumn() >= 1 && diagonalRight.getColumn() <= 8) {
+            ChessPiece diagonalRightPiece = board.getPiece(diagonalRight);
+            if (diagonalRightPiece != null && diagonalRightPiece.getTeamColor() != pieceColor) {
+                if(diagonalRight.getRow() != 1) {
+                    legalMoves.add(new ChessMove(position, diagonalRight, null));
+                }
+                if(diagonalRight.getRow() == 1){
+                    diagonalLeftPromotion(position, legalMoves, diagonalRight);
+                }
+            }
+        }
+    }
+
+    private void diagonalLeftPromotion(ChessPosition position, List<ChessMove> legalMoves, ChessPosition diagonalLeft) {
+        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.BISHOP));
+        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.QUEEN));
+        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.KNIGHT));
+        legalMoves.add(new ChessMove(position, diagonalLeft, ChessPiece.PieceType.ROOK));
+    }
+
+    private void edgeEightCondition(ChessPosition position, List<ChessMove> legalMoves, ChessPosition diagonalRight) {
+        if(diagonalRight.getRow() == 8){
+            diagonalLeftPromotion(position, legalMoves, diagonalRight);
+        }
     }
 }
