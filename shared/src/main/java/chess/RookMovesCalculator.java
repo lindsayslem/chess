@@ -17,32 +17,36 @@ public class RookMovesCalculator {
 
         int[][] moves = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
 
-        for(int[] move : moves){
-            int rowDirection = move[0];
-            int colDirection = move[1];
+        return RookAndBishopMovements(position, legalMoves, moves, board, pieceColor);}
 
-            int currentRow = position.getRow() + rowDirection;
-            int currentCol = position.getColumn() + colDirection;
+        static Collection<ChessMove> RookAndBishopMovements(ChessPosition position, List<ChessMove> legalMoves, int[][] moves, ChessBoard board, ChessGame.TeamColor pieceColor) {
+            for(int[] move : moves){
+                int rowDirection = move[0];
+                int colDirection = move[1];
 
-            while(currentRow > 0 && currentRow  < 9 && currentCol > 0 && currentCol < 9){
-                ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
-                ChessPiece newPositionPiece = board.getPiece(newPosition);
+                int currentRow = position.getRow() + rowDirection;
+                int currentCol = position.getColumn() + colDirection;
 
-                if(newPositionPiece == null){
-                    legalMoves.add(new ChessMove(position, newPosition, null));
-                }
-                else{
-                    if(newPositionPiece.getTeamColor() != pieceColor){
+                while(currentRow > 0 && currentRow  < 9 && currentCol > 0 && currentCol < 9){
+                    ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
+                    ChessPiece newPositionPiece = board.getPiece(newPosition);
+
+                    if(newPositionPiece == null){
                         legalMoves.add(new ChessMove(position, newPosition, null));
                     }
-                    break;
+                    else{
+                        if(newPositionPiece.getTeamColor() != pieceColor){
+                            legalMoves.add(new ChessMove(position, newPosition, null));
+                        }
+                        break;
+                    }
+                    currentRow += rowDirection;
+                    currentCol += colDirection;
                 }
-                currentRow += rowDirection;
-                currentCol += colDirection;
             }
+            /*returns all valid move*/
+            return legalMoves;
         }
-        /*returns all valid move*/
-        return legalMoves;
 
     }
-}
+

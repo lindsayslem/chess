@@ -34,7 +34,7 @@ public class GameServiceTest {
 
         // create a new game
         GameData gameData = new GameData(1, null, null, "gameName", new ChessGame());
-        GameData result = gameService.createGame(gameData, authData.getAuthToken());
+        GameData result = gameService.createGame(gameData, authData.authToken());
 
         assertNotNull(result);
         assertEquals("Test Game", result.getGameName());
@@ -93,7 +93,7 @@ public class GameServiceTest {
         gameDataDAO.createGame("Game2");
 
         // list the games
-        Map<Integer, GameData> games = gameService.listGames(authData.getAuthToken());
+        Map<Integer, GameData> games = gameService.listGames(authData.authToken());
 
         assertNotNull(games);
         assertEquals(2, games.size());

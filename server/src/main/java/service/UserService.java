@@ -20,7 +20,7 @@ public class UserService {
     public AuthData register(UserData user) throws DataAccessException {
         // Check if user already exists
         try {
-            userDataDAO.getUser(user.getUsername());
+            userDataDAO.getUser(user.username());
             throw new DataAccessException("Username already taken");
         } catch (DataAccessException e) {
             // Username does not exist, proceed with registration
@@ -31,7 +31,7 @@ public class UserService {
 
         // Create auth token
         String authToken = UUID.randomUUID().toString();
-        AuthData authData = new AuthData(authToken, user.getUsername());
+        AuthData authData = new AuthData(authToken, user.username());
         authDataDAO.createAuth(authData);
 
         return authData;
@@ -39,14 +39,14 @@ public class UserService {
 
     public AuthData login(UserData user) throws DataAccessException {
         // Verify user credentials
-        UserData storedUser = userDataDAO.getUser(user.getUsername());
-        if (!storedUser.getPassword().equals(user.getPassword())) {
+        UserData storedUser = userDataDAO.getUser(user.username());
+        if (!storedUser.password().equals(user.password())) {
             throw new DataAccessException("Unauthorized");
         }
 
         // Create new auth token
         String authToken = UUID.randomUUID().toString();
-        AuthData authData = new AuthData(authToken, user.getUsername());
+        AuthData authData = new AuthData(authToken, user.username());
         authDataDAO.createAuth(authData);
 
         return authData;
@@ -57,13 +57,4 @@ public class UserService {
         authDataDAO.deleteAuth(authToken);
     }
 
-    public boolean validateToken(String authToken) throws DataAccessException {
-        // Check if the auth token is valid
-        try {
-            authDataDAO.getAuth(authToken);
-            return true;
-        } catch (DataAccessException e) {
-            return false;
-        }
-    }
 }

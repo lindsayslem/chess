@@ -75,7 +75,7 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPiece piece = board.getPiece(move.getStartPosition());
+        ChessPiece piece = board.getPiece(move.startPosition());
         if(piece == null){
             throw new InvalidMoveException("start is null");
         }
@@ -83,7 +83,7 @@ public class ChessGame {
             throw new InvalidMoveException("invalid move - wrong team");
         }
 
-        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+        Collection<ChessMove> validMoves = validMoves(move.startPosition());
         if(!validMoves.contains(move)){
             throw new InvalidMoveException("invalid move");
         }
@@ -117,7 +117,7 @@ public class ChessGame {
                 if(piece != null && piece.getTeamColor() != teamColor){
                     Collection<ChessMove> validMoves = piece.pieceMoves(board, new ChessPosition(row+1, col+1));
                     for(ChessMove move : validMoves){
-                        if(move.getEndPosition().equals(kingPosition)){
+                        if(move.endPosition().equals(kingPosition)){
                             return true;
                         }
                     }
@@ -197,15 +197,15 @@ public class ChessGame {
                 }
             }
         }
-        ChessPiece movingPiece = board.getPiece(move.getStartPosition());
+        ChessPiece movingPiece = board.getPiece(move.startPosition());
         if(movingPiece != null){
-            if(move.getPromotionPiece() != null) {
-                newBoard.addPiece(move.getEndPosition(), new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece()));
+            if(move.promotionPiece() != null) {
+                newBoard.addPiece(move.endPosition(), new ChessPiece(movingPiece.getTeamColor(), move.promotionPiece()));
             }
             else{
-                newBoard.addPiece(move.getEndPosition(), movingPiece);
+                newBoard.addPiece(move.endPosition(), movingPiece);
             }
-            newBoard.addPiece(move.getStartPosition(), null);
+            newBoard.addPiece(move.startPosition(), null);
         }
 
         return newBoard;

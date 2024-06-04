@@ -10,10 +10,10 @@ public class AuthDataDAO implements IAuthDataDAO {
 
     @Override
     public void createAuth(AuthData auth) throws DataAccessException {
-        if (authDataMap.containsKey(auth.getAuthToken())) {
+        if (authDataMap.containsKey(auth.authToken())) {
             throw new DataAccessException("Auth token already exists.");
         }
-        authDataMap.put(auth.getAuthToken(), auth);
+        authDataMap.put(auth.authToken(), auth);
     }
 
     @Override

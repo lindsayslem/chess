@@ -7,7 +7,8 @@ import model.AuthData;
 import model.GameData;
 import chess.ChessGame;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
 
 public class GameService {
     private final GameDataDAO gameDataDAO;
@@ -23,9 +24,8 @@ public class GameService {
         AuthData authData = authDataDAO.getAuth(authToken);
 
         // Create game
-        GameData createdGame = gameDataDAO.createGame(gameData.getGameName());
 
-        return createdGame;
+        return gameDataDAO.createGame(gameData.getGameName());
     }
 
     public boolean joinGame(ChessGame.TeamColor playerColor, int gameID, String authToken) throws DataAccessException {
@@ -40,7 +40,7 @@ public class GameService {
             throw new DataAccessException("Bad request");
         }
 
-        String username = authData.getUsername();
+        String username = authData.username();
         if (playerColor == ChessGame.TeamColor.WHITE) {
             if (gameData.getWhiteUsername() != null) {
                 return false;

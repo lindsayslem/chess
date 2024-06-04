@@ -10,10 +10,10 @@ public class UserDataDAO implements IUserDataDAO {
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
-        if(userDataMap.containsKey(user.getUsername())){
+        if(userDataMap.containsKey(user.username())){
             throw new DataAccessException("Username already exists");
         }
-        userDataMap.put(user.getUsername(), user);
+        userDataMap.put(user.username(), user);
     }
 
     @Override

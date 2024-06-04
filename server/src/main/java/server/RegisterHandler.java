@@ -24,7 +24,7 @@ public class RegisterHandler implements Route {
     public Object handle(Request request, Response response) {
         try {
             UserData userData = gson.fromJson(request.body(), UserData.class);
-            if(userData.getUsername() == null || userData.getPassword() == null || userData.getEmail() == null){
+            if(userData.username() == null || userData.password() == null || userData.email() == null){
                 response.status(400);
                 return gson.toJson(new Error("Error: bad request"));
             }

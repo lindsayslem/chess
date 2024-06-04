@@ -10,7 +10,7 @@ public class GameDataDAO implements IGameDataDAO {
     private int nextGameID = 1;
 
     @Override
-    public GameData createGame(String gameName) throws DataAccessException {
+    public GameData createGame(String gameName) {
         int gameID = nextGameID++;
         GameData gameData = new GameData(gameID, null, null, gameName, null);
         gameDataMap.put(gameID, gameData);

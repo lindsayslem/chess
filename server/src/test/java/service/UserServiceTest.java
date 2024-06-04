@@ -84,7 +84,7 @@ class TestUserDataDAO extends UserDataDAO{
 
     @Override
     public UserData getUser(String username) throws DataAccessException{
-        if(user != null && user.getUsername().equals(username)){
+        if(user != null && user.username().equals(username)){
             return user;
         }
         throw new DataAccessException("User not found");
@@ -92,7 +92,7 @@ class TestUserDataDAO extends UserDataDAO{
 
     @Override
     public void createUser(UserData user) throws DataAccessException{
-        if(this.user != null && this.user.getUsername().equals(user.getUsername())){
+        if(this.user != null && this.user.username().equals(user.username())){
             throw new DataAccessException("User already exists");
         }
         this.user = user;
@@ -108,7 +108,7 @@ class TestAuthData1DAO extends AuthDataDAO{
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException{
-        if(authData != null && authData.getAuthToken().equals(authToken)){
+        if(authData != null && authData.authToken().equals(authToken)){
             return authData;
         }
         return null;
@@ -121,7 +121,7 @@ class TestAuthData1DAO extends AuthDataDAO{
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException{
-        if(authData != null && authData.getAuthToken().equals(authToken)){
+        if(authData != null && authData.authToken().equals(authToken)){
             authData = null;
         }
         else{
