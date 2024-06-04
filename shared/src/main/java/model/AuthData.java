@@ -1,7 +1,7 @@
 package model;
 
 public class AuthData {
-    private final String authToken;
+    private String authToken;
     private final String username;
 
     public AuthData(String authToken, String username) {
@@ -16,4 +16,5 @@ public class AuthData {
     public String getUsername() {
         return username;
     }
+
 }

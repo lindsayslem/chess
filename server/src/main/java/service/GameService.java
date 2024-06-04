@@ -30,7 +30,7 @@ public class GameService {
 
     public boolean joinGame(ChessGame.TeamColor playerColor, int gameID, String authToken) throws DataAccessException {
         AuthData authData = authDataDAO.getAuth(authToken);
-        //check if game exists
+
         if (authData == null) {
             throw new DataAccessException("Unauthorized");
         }
