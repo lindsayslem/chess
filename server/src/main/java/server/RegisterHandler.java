@@ -8,7 +8,7 @@ import spark.Route;
 import service.UserService;
 import model.UserData;
 import model.AuthData;
-import dataAccess.DataAccessException;
+import dataaccess.DataAccessException;
 import model.Error;
 
 

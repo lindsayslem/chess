@@ -4,9 +4,9 @@ import spark.Spark;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
-import dataAccess.AuthDataDAO;
-import dataAccess.GameDataDAO;
-import dataAccess.UserDataDAO;
+import dataaccess.AuthDataDAO;
+import dataaccess.GameDataDAO;
+import dataaccess.UserDataDAO;
 
 
 public class Server {

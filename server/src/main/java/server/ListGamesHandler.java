@@ -6,7 +6,7 @@ import spark.Response;
 import spark.Route;
 import service.GameService;
 import model.GameData;
-import dataAccess.DataAccessException;
+import dataaccess.DataAccessException;
 import java.util.Map;
 
 import model.Error;

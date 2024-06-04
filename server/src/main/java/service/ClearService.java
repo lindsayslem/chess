@@ -1,9 +1,9 @@
 package service;
 
-import dataAccess.AuthDataDAO;
-import dataAccess.GameDataDAO;
-import dataAccess.UserDataDAO;
-import dataAccess.DataAccessException;
+import dataaccess.AuthDataDAO;
+import dataaccess.GameDataDAO;
+import dataaccess.UserDataDAO;
+import dataaccess.DataAccessException;
 
 public class ClearService {
     private final UserDataDAO userDataDAO;

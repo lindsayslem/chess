@@ -4,7 +4,7 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 import service.ClearService;
-import dataAccess.DataAccessException;
+import dataaccess.DataAccessException;
 import com.google.gson.Gson;
 import model.Error;
 

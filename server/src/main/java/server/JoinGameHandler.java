@@ -8,7 +8,7 @@ import spark.Response;
 import spark.Route;
 import service.GameService;
 import model.Error;
-import dataAccess.DataAccessException;
+import dataaccess.DataAccessException;
 import chess.ChessGame;
 
 public class JoinGameHandler implements Route {

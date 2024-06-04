@@ -1,9 +1,9 @@
 package service;
 
-import dataAccess.AuthDataDAO;
-import dataAccess.DataAccessException;
-import dataAccess.GameDataDAO;
-import dataAccess.UserDataDAO;
+import dataaccess.AuthDataDAO;
+import dataaccess.DataAccessException;
+import dataaccess.GameDataDAO;
+import dataaccess.UserDataDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
