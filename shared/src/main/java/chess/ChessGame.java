@@ -75,7 +75,7 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPiece piece = board.getPiece(move.startPosition());
+        ChessPiece piece = board.getPiece(move.getStartPosition());
         if(piece == null){
             throw new InvalidMoveException("start is null");
         }
@@ -83,7 +83,7 @@ public class ChessGame {
             throw new InvalidMoveException("invalid move - wrong team");
         }
 
-        Collection<ChessMove> validMoves = validMoves(move.startPosition());
+        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         if(!validMoves.contains(move)){
             throw new InvalidMoveException("invalid move");
         }
@@ -197,7 +197,7 @@ public class ChessGame {
                 }
             }
         }
-        ChessPiece movingPiece = board.getPiece(move.startPosition());
+        ChessPiece movingPiece = board.getPiece(move.getStartPosition());
         if(movingPiece != null){
             if(move.getStartPosition() != null) {
                 newBoard.addPiece(move.getEndPosition(), new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece()));
@@ -205,7 +205,7 @@ public class ChessGame {
             else{
                 newBoard.addPiece(move.getEndPosition(), movingPiece);
             }
-            newBoard.addPiece(move.startPosition(), null);
+            newBoard.addPiece(move.getStartPosition(), null);
         }
 
         return newBoard;
