@@ -1,8 +1,7 @@
 package chess;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Collection;
 
 public class QueenMovesCalculator {
     private final ChessGame.TeamColor pieceColor;
@@ -16,11 +15,12 @@ public class QueenMovesCalculator {
     public Collection<ChessMove> pieceMove(ChessPosition position) {
         List<ChessMove> legalMoves = new ArrayList<>();
 
-        BishopMovesCalculator bishopMovesCalculator = new BishopMovesCalculator(pieceColor, board);
-        legalMoves.addAll(bishopMovesCalculator.pieceMove(position));
-
         RookMovesCalculator rookMovesCalculator = new RookMovesCalculator(pieceColor, board);
+        BishopMovesCalculator bishopMovesCalculator = new BishopMovesCalculator(pieceColor, board);
+
         legalMoves.addAll(rookMovesCalculator.pieceMove(position));
+
+        legalMoves.addAll(bishopMovesCalculator.pieceMove(position));
 
         return legalMoves;
     }

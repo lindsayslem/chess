@@ -1,8 +1,7 @@
 package chess;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Collection;
 
 public class RookMovesCalculator {
     private final ChessGame.TeamColor pieceColor;
@@ -12,10 +11,11 @@ public class RookMovesCalculator {
         this.pieceColor = pieceColor;
         this.board = board;
     }
+
     public Collection<ChessMove> pieceMove(ChessPosition position){
         List<ChessMove> legalMoves = new ArrayList<>();
 
-        int[][] moves = {{0, 1}, {0, -1}, {-1, 0}, {1, 0}};
+        int[][] moves = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
 
         for(int[] move : moves){
             int rowDirection = move[0];
@@ -24,7 +24,7 @@ public class RookMovesCalculator {
             int currentRow = position.getRow() + rowDirection;
             int currentCol = position.getColumn() + colDirection;
 
-            while(currentRow > 0 && currentRow < 9 && currentCol > 0 && currentCol < 9){
+            while(currentRow > 0 && currentRow  < 9 && currentCol > 0 && currentCol < 9){
                 ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
                 ChessPiece newPositionPiece = board.getPiece(newPosition);
 
@@ -32,7 +32,7 @@ public class RookMovesCalculator {
                     legalMoves.add(new ChessMove(position, newPosition, null));
                 }
                 else{
-                    if(newPositionPiece.getTeamColor() != pieceColor) {
+                    if(newPositionPiece.getTeamColor() != pieceColor){
                         legalMoves.add(new ChessMove(position, newPosition, null));
                     }
                     break;
@@ -41,6 +41,8 @@ public class RookMovesCalculator {
                 currentCol += colDirection;
             }
         }
+        /*returns all valid move*/
         return legalMoves;
+
     }
 }
