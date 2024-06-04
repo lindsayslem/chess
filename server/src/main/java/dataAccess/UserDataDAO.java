@@ -26,7 +26,7 @@ public class UserDataDAO implements IUserDataDAO {
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException{
         userDataMap.clear();
     }
 }

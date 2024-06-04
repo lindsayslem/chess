@@ -12,13 +12,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
     private UserService userService;
-    private TestUserData userDataDAO;
-    private TestAuthData1 authDataDAO;
+    private TestUserDataDAO userDataDAO;
+    private TestAuthData1DAO authDataDAO;
 
     @BeforeEach
     public void setUp() {
-        userDataDAO = new TestUserData();
-        authDataDAO = new TestAuthData1();
+        userDataDAO = new TestUserDataDAO();
+        authDataDAO = new TestAuthData1DAO();
         userService = new UserService(userDataDAO, authDataDAO);
     }
 
@@ -33,9 +33,9 @@ public class UserServiceTest {
         assertEquals(user, userDataDAO.getUser("username"));
     }
 
-    //user already exists
     @Test
     public void registerFailure() throws DataAccessException{
+        //user already exists
         UserData user = new UserData("username", "password", "email");
         userDataDAO.setUser(user);
 
@@ -54,7 +54,7 @@ public class UserServiceTest {
 
     @Test
     public void loginFailure() throws DataAccessException {
-        //tests for wring password login
+        // wrong password login
         UserData user = new UserData("username", "password", "email");
         UserData storedUser = new UserData("username", "wrongPassword", "email");
         userDataDAO.setUser(storedUser);
@@ -70,12 +70,12 @@ public class UserServiceTest {
         assertDoesNotThrow(() -> userService.logout(authToken));
         assertNull(authDataDAO.getAuth(authToken));
 
-        //already logged out
+        // already logged out
         assertThrows(DataAccessException.class, () -> userService.logout(authToken));
     }
 }
 
-class TestUserData extends UserDataDAO{
+class TestUserDataDAO extends UserDataDAO{
     private UserData user;
 
     public void setUser(UserData user){
@@ -99,7 +99,7 @@ class TestUserData extends UserDataDAO{
     }
 }
 
-class TestAuthData1 extends AuthDataDAO{
+class TestAuthData1DAO extends AuthDataDAO{
     private AuthData authData;
 
     public void  setAuth(AuthData authData){

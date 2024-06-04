@@ -9,5 +9,5 @@ public interface IGameDataDAO {
     GameData getGame(int gameID) throws DataAccessException;
     void updateGame(GameData game) throws DataAccessException;
     Map<Integer, GameData> listGames();
-    void clear();
+    void clear() throws DataAccessException;
 }

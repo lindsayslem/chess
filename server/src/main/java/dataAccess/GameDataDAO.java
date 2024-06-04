@@ -31,6 +31,7 @@ public class GameDataDAO implements IGameDataDAO {
         if (!gameDataMap.containsKey(game.getGameID())) {
             throw new DataAccessException("Game not found.");
         }
+
         gameDataMap.put(game.getGameID(), game);
     }
 
@@ -40,7 +41,7 @@ public class GameDataDAO implements IGameDataDAO {
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException{
         gameDataMap.clear();
         nextGameID = 1;
     }
