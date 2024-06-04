@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collection;
 
-import static chess.KnightMovesCalculator.KingAndKnightMovements;
+import static chess.KnightMovesCalculator.kingAndKnightMovements;
 
 public class KingMovesCalculator {
 
@@ -19,7 +19,7 @@ public class KingMovesCalculator {
 
         int[][] moves = {{1, 0}, {1, 1}, {0, 1}, {-1, 1},{-1, 0}, {-1, -1}, {0, -1}, {1, -1}};
 
-        return KingAndKnightMovements(position, legalMoves, moves, board, pieceColor);
+        return kingAndKnightMovements(position, legalMoves, moves, board, pieceColor);
     }
 
 }
