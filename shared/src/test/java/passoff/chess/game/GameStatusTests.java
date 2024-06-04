@@ -230,4 +230,3 @@ public class GameStatusTests {
                 "Black is not in a stalemate but isInStalemate returned true");
     }
 }
-//trying to push to github

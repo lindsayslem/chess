@@ -381,5 +381,5 @@ public class MakeMoveTests {
         Assertions.assertEquals(ChessGame.TeamColor.BLACK, blackEndPiece.getTeamColor(),
                 "Found piece at end position is the wrong team color");
     }
-    //trying to push to github
+
 }
