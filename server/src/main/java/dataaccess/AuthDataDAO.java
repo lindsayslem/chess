@@ -34,7 +34,7 @@ public class AuthDataDAO implements IAuthDataDAO {
     }
 
     @Override
-    public void clear() throws DataAccessException {
+    public void clearAuth() throws DataAccessException {
         authDataMap.clear();
     }
 }
