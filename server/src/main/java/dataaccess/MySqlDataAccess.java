@@ -147,11 +147,10 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
 
 
     private UserData readUser(ResultSet rs) throws SQLException {
-        var id = rs.getInt("id");
         var username = rs.getString("username");
         var password = rs.getString("password");
         var email = rs.getString("email");
-        return new UserData(id, username, password, email);
+        return new UserData(username, password, email);
     }
 
     private GameData readGame(ResultSet rs) throws SQLException {
