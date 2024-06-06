@@ -4,11 +4,13 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import chess.ChessGame;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
+
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -20,17 +22,18 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
         configureDatabase();
     }
 
-    public UserData createUser(UserData user) throws DataAccessException {
+    @Override
+    public void  createUser(UserData user) throws DataAccessException {
         var statement = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-        var id = executeUpdate(statement, user.username(), user.password(), user.email());
-        return new UserData(id, user.username(), user.password(), user.email());
+        executeUpdate(statement, user.username(), user.password(), user.email());
     }
 
-    public UserData getUser(int id) throws DataAccessException {
+    @Override
+    public UserData getUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT id, username, password, email FROM users WHERE id=?";
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, id);
+                ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return readUser(rs);
@@ -43,44 +46,25 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
         return null;
     }
 
-    public Collection<UserData> listUsers() throws DataAccessException {
-        var result = new ArrayList<UserData>();
-        try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT id, username, password, email FROM users";
-            try (var ps = conn.prepareStatement(statement)) {
-                try (var rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        result.add(readUser(rs));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
-        }
-        return result;
-    }
-
-    public void deleteUser(Integer id) throws DataAccessException {
-        var statement = "DELETE FROM users WHERE id=?";
-        executeUpdate(statement, id);
-    }
-
-    public void deleteAllUsers() throws DataAccessException {
-        var statement = "TRUNCATE user";
+    @Override
+    public void clearUser() throws DataAccessException {
+        var statement = "TRUNCATE TABLE users";
         executeUpdate(statement);
     }
-    public GameData createGame(GameData game) throws DataAccessException {
-        var statement = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
-        var json = new Gson().toJson(game);
-        var id = executeUpdate(statement, game.getGameID(), game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), game.getGame(), json);
-        return new GameData(id, game.getGameID(), game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), game.getGame());
+
+    @Override
+    public GameData createGame(String gameName) throws DataAccessException {
+        var statement = "INSERT INTO games (gameName) VALUES (?)";
+        var id = executeUpdate(statement, gameName);
+        return new GameData(id, null, null, gameName, null);
     }
 
-    public GameData getGame(int id) throws DataAccessException {
+    @Override
+    public GameData getGame(int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT id, gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE id=?";
+            var statement = "SELECT id, gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameID=?";
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, id);
+                ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return readGame(rs);
@@ -93,14 +77,23 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
         return null;
     }
 
-    public Collection<GameData> listGames() throws DataAccessException {
-        var result = new ArrayList<GameData>();
+    @Override
+    public void updateGame(GameData game) throws DataAccessException{
+        var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
+        var json = new Gson().toJson(game.getGame());
+        executeUpdate(statement, game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), json, game.getGameID());
+    }
+
+    @Override
+    public Map<Integer, GameData> listGames() throws DataAccessException {
+        var result = new HashMap<Integer, GameData>();
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT id, gameID, whiteUsername, blackUsername, gameName, game FROM games";
             try (var ps = conn.prepareStatement(statement)) {
                 try (var rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        result.add(readGame(rs));
+                        var game = readGame(rs);
+                        result.put(game.getGameID(), game);
                     }
                 }
             }
@@ -110,24 +103,27 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
         return result;
     }
 
-    public void deleteGame(Integer id) throws DataAccessException {
-        var statement = "DELETE FROM games WHERE id=?";
-        executeUpdate(statement, id);
+    @Override
+    public void clearGame() throws DataAccessException{
+        var statement = "TRUNCATE TABLE games";
+        executeUpdate(statement);
     }
 
-    public AuthData createAuth(AuthData auth) throws DataAccessException {
+    @Override
+    public void createAuth(AuthData auth) throws DataAccessException {
         var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
-        return executeUpdate(statement, auth.getAuth(), auth.getUsername());
+        executeUpdate(statement, auth.authToken(), auth.username());
     }
 
+    @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT authToken, username FROM users WHERE id=?";
+            var statement = "SELECT authToken, username FROM users WHERE authToken=?";
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, authToken);
+                ps.setString(1, authToken);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return new AuthData(rs.getString("authToken"), rs.getInt("userID"));
+                        return new AuthData(rs.getString("authToken"), rs.getString("username"));
                     }
                 }
             }
@@ -137,44 +133,49 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
         return null;
     }
 
-    public void deleteGame(String authToken) throws DataAccessException {
+    @Override
+    public void deleteAuth(String authToken) throws DataAccessException {
         var statement = "DELETE FROM auth WHERE authToken=?";
         executeUpdate(statement, authToken);
     }
 
-    public void clear() throws DataAccessException{
-    var statement = "TRUNCATE TABLE auth";
-    executeUpdate(statement);
+    @Override
+    public void clearAuth() throws DataAccessException{
+        var statement = "TRUNCATE TABLE auth";
+        executeUpdate(statement);
     }
+
 
     private UserData readUser(ResultSet rs) throws SQLException {
         var id = rs.getInt("id");
         var username = rs.getString("username");
         var password = rs.getString("password");
         var email = rs.getString("email");
-        return new UserData(username, password, email);
+        return new UserData(id, username, password, email);
     }
 
-    private UserData readGame(ResultSet rs) throws SQLException {
-        var id = rs.getInt("id");
-        var gameID = rs.getString("gameID");
+    private GameData readGame(ResultSet rs) throws SQLException {
+        var gameID = rs.getInt("gameID");
         var whiteUsername = rs.getString("whiteUsername");
         var blackUsername = rs.getString("blackUsername");
         var gameName = rs.getString("gameName");
-        var game = rs.getString("game");
         var json = rs.getString("game");
-        var gameJson = new Gson().fromJson(json, GameData.class);
-        return new GameData(id, gameID, whiteUsername, blackUsername, gameName, game, gameJson.getGame());
+        var game = new Gson().fromJson(json, ChessGame.class);
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+    }
 
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {
                     var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
-                    else if (param == null) ps.setNull(i + 1, NULL);
+                    switch (param) {
+                        case String p -> ps.setString(i + 1, p);
+                        case Integer p -> ps.setInt(i + 1, p);
+                        case null -> ps.setNull(i + 1, NULL);
+                        default -> {
+                        }
+                    }
                 }
                 ps.executeUpdate();
 
@@ -206,11 +207,11 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
               `gameID` int NOT NULL,
               `whiteUsername` varchar(50) NOT NULL UNIQUE,
               `blackUsername` varchar(50) NOT NULL UNIQUE,
-              `gameName` int NOT NULL,
-              `game` int NOT NULL,
+              `gameName` varchar(50) NOT NULL UNIQUE,
+              `game` TEXT NOT NULL,
               PRIMARY KEY (`id`),
-              FOREIGN KEY ('whiteUsername') REFERENCES users('id'),
-              FOREIGN KEY ('blackUsername') REFERENCES users('id'),
+              FOREIGN KEY ('whiteUsername') REFERENCES users('username'),
+              FOREIGN KEY ('blackUsername') REFERENCES users('username'),
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """,
             """
@@ -238,5 +239,5 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
         }
     }
 }
-}
+
 
