@@ -31,7 +31,7 @@ class ClearServiceTest {
         // mock DAO
         UserDataDAO testUserDataDAO = new UserDataDAO() {
             @Override
-            public void clear() throws DataAccessException {
+            public void clearUser() throws DataAccessException {
                 throw new DataAccessException("Error clearing data");
             }
         };
