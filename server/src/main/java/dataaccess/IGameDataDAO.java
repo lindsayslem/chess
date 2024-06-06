@@ -8,6 +8,6 @@ public interface IGameDataDAO {
     GameData createGame(String gameName) throws DataAccessException;
     GameData getGame(int gameID) throws DataAccessException;
     void updateGame(GameData game) throws DataAccessException;
-    Map<Integer, GameData> listGames();
-    void clear() throws DataAccessException;
+    Map<Integer, GameData> listGames() throws DataAccessException;
+    void clearGame() throws DataAccessException;
 }
