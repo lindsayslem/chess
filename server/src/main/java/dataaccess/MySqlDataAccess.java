@@ -5,7 +5,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import chess.ChessGame;
-
+import org.mindrot.jbcrypt.BCrypt;
 
 
 import java.sql.*;
@@ -24,8 +24,9 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
 
     @Override
     public void  createUser(UserData user) throws DataAccessException {
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         var statement = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-        executeUpdate(statement, user.username(), user.password(), user.email());
+        executeUpdate(statement, user.username(), hashedPassword, user.email());
     }
 
     @Override
@@ -44,6 +45,14 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
         return null;
+    }
+
+    public boolean verifyUser(String username, String providedClearTestPassword) throws DataAccessException{
+        UserData user = getUser(username);
+        if(user != null){
+            return BCrypt.checkpw(providedClearTestPassword, user.password());
+        }
+        return false;
     }
 
     @Override
