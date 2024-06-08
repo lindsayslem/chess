@@ -12,6 +12,7 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
@@ -22,31 +23,35 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
         configureDatabase();
     }
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
+    @Override
+    public UserData createUser(UserData user) throws DataAccessException {
+        var statement = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        int generatedId;
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+            ps.setString(1, user.username());
+            ps.setString(2, user.email());
+            ps.setString(3, hashedPassword);
+            ps.executeUpdate();
+
+            try (var rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    generatedId = rs.getInt(1);
+                } else {
+                    throw new DataAccessException(String.format("Unable to generate key for user: %s", user.username()));
                 }
             }
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("Unable to create user: %s", e.getMessage()));
         }
-    }
-
-
-    @Override
-    public void  createUser(UserData user) throws DataAccessException {
-        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-        var statement = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-        executeUpdate(statement, user.username(), hashedPassword, user.email());
+        return new UserData(user.username(), hashedPassword, user.email());
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT id, username, password, email FROM users WHERE id=?";
+            var statement = "SELECT username, password, email FROM users WHERE username=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {
@@ -56,7 +61,7 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+            throw new DataAccessException(format("Unable to read data: %s", e.getMessage()));
         }
         return null;
     }
@@ -71,15 +76,41 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
 
     @Override
     public void clearUser() throws DataAccessException {
-        var statement = "TRUNCATE TABLE users";
-        executeUpdate(statement);
+        try {
+            executeUpdate("SET FOREIGN_KEY_CHECKS = 0");
+            executeUpdate("DELETE FROM games");
+            executeUpdate("DELETE FROM auth");
+            executeUpdate("DELETE FROM users");
+            executeUpdate("SET FOREIGN_KEY_CHECKS = 1");
+        } catch (DataAccessException e) {
+            throw new DataAccessException(String.format("Unable to clear user data: %s", e.getMessage()));
+        }
     }
 
     @Override
-    public GameData createGame(String gameName) throws DataAccessException {
-        var statement = "INSERT INTO games (gameName) VALUES (?)";
-        var id = executeUpdate(statement, gameName);
-        return new GameData(id, null, null, gameName, null);
+    public GameData createGame(GameData game) throws DataAccessException {
+        var statement = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
+        String gameJson = new Gson().toJson(game.getGame());
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, game.getGameID());
+            ps.setString(2, game.getWhiteUsername());
+            ps.setString(3, game.getBlackUsername());
+            ps.setString(4, game.getGameName());
+            ps.setString(5, gameJson);
+            ps.executeUpdate();
+
+            try (var rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int generatedId = rs.getInt(1);
+                    return new GameData(game.getGameID(), game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), game.getGame());
+                } else {
+                    throw new DataAccessException("Unable to generate key for game.");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("Unable to create game: %s", e.getMessage()));
+        }
     }
 
     @Override
@@ -95,7 +126,7 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+            throw new DataAccessException(format("Unable to read data: %s", e.getMessage()));
         }
         return null;
     }
@@ -121,7 +152,7 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+            throw new DataAccessException(format("Unable to read data: %s", e.getMessage()));
         }
         return result;
     }
@@ -151,7 +182,7 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+            throw new DataAccessException(format("Unable to read data: %s", e.getMessage()));
         }
         return null;
     }
@@ -209,43 +240,56 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
                 return 0;
             }
         } catch (SQLException e) {
-            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException(format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
 
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS  users (
-              `id` int NOT NULL AUTO_INCREMENT,
-              `username` varchar(50) NOT NULL UNIQUE,
-              `password` varchar(255) NOT NULL,
-              `email` varchar(50) NOT NULL UNIQUE,
-              PRIMARY KEY (`id`),
+            CREATE TABLE IF NOT EXISTS users (
+              id INT NOT NULL AUTO_INCREMENT,
+              username VARCHAR(50) NOT NULL UNIQUE,
+              password VARCHAR(255) NOT NULL,
+              email VARCHAR(50) NOT NULL UNIQUE,
+              PRIMARY KEY (id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """,
             """
-            CREATE TABLE IF NOT EXISTS  games (
-              `id` int NOT NULL AUTO_INCREMENT,
-              `gameID` int NOT NULL,
-              `whiteUsername` varchar(50) NOT NULL UNIQUE,
-              `blackUsername` varchar(50) NOT NULL UNIQUE,
-              `gameName` varchar(50) NOT NULL UNIQUE,
-              `game` TEXT NOT NULL,
-              PRIMARY KEY (`id`),
-              FOREIGN KEY ('whiteUsername') REFERENCES users('username'),
-              FOREIGN KEY ('blackUsername') REFERENCES users('username'),
+            CREATE TABLE IF NOT EXISTS games (
+              id INT NOT NULL AUTO_INCREMENT,
+              gameID INT NOT NULL,
+              whiteUsername VARCHAR(50) NOT NULL,
+              blackUsername VARCHAR(50) NOT NULL,
+              gameName VARCHAR(50) NOT NULL,
+              game TEXT NOT NULL,
+              PRIMARY KEY (id),
+              FOREIGN KEY (whiteUsername) REFERENCES users(username),
+              FOREIGN KEY (blackUsername) REFERENCES users(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """,
             """
-            CREATE TABLE IF NOT EXISTS  auth (
-              `authToken` varchar(255) NOT NULL,
-              `userID` int NOT NULL,
-              PRIMARY KEY (`authToken`),
-              FOREIGN KEY (`authID`),
+            CREATE TABLE IF NOT EXISTS auth (
+              authToken VARCHAR(255) NOT NULL,
+              userID INT NOT NULL,
+              PRIMARY KEY (authToken),
+              FOREIGN KEY (userID) REFERENCES users(id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
 
     };
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        }catch (SQLException e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+    }
 
 }
 

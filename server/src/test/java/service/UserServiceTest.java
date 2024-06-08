@@ -91,11 +91,12 @@ class TestUserDataDAO extends UserDataDAO{
     }
 
     @Override
-    public void createUser(UserData user) throws DataAccessException{
+    public UserData createUser(UserData user) throws DataAccessException{
         if(this.user != null && this.user.username().equals(user.username())){
             throw new DataAccessException("User already exists");
         }
         this.user = user;
+        return user;
     }
 }
 

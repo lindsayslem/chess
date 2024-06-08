@@ -9,11 +9,12 @@ public class UserDataDAO implements IUserDataDAO {
     private final Map<String, UserData> userDataMap = new HashMap<>();
 
     @Override
-    public void createUser(UserData user) throws DataAccessException {
+    public UserData createUser(UserData user) throws DataAccessException {
         if(userDataMap.containsKey(user.username())){
             throw new DataAccessException("Username already exists");
         }
         userDataMap.put(user.username(), user);
+        return user;
     }
 
     @Override
