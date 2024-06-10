@@ -88,71 +88,119 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
     }
 
     @Override
-    public GameData createGame(GameData game) throws DataAccessException {
-        var statement = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
-        String gameJson = new Gson().toJson(game.getGame());
-        try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, game.getGameID());
-            ps.setString(2, game.getWhiteUsername());
-            ps.setString(3, game.getBlackUsername());
-            ps.setString(4, game.getGameName());
-            ps.setString(5, gameJson);
-            ps.executeUpdate();
+    public GameData createGame(String gameName) throws DataAccessException {
+        if (gameName == null || gameName.trim().isEmpty()) {
+            throw new DataAccessException("Game name cannot be null or empty.");
+        }
 
-            try (var rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    int generatedId = rs.getInt(1);
-                    return new GameData(game.getGameID(), game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), game.getGame());
-                } else {
-                    throw new DataAccessException("Unable to generate key for game.");
+        var statement = "INSERT INTO games (gameName, whiteUsername, blackUsername, game) VALUES (?, ?, ?, ?)";
+        var check = "SELECT COUNT(*) FROM games WHERE gameName = ?";
+        try (Connection conn = DatabaseManager.getConnection()) {
+            // Disable auto-commit mode
+            conn.setAutoCommit(false);
+
+            // Check if the game already exists
+            try (PreparedStatement checkStmt = conn.prepareStatement(check)) {
+                checkStmt.setString(1, gameName);
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        throw new DataAccessException("Game with the same name already exists.");
+                    }
+                }
+            }
+
+            // Insert the new game
+            try (PreparedStatement stmt = conn.prepareStatement(statement, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                stmt.setString(1, gameName);
+                stmt.setNull(2, Types.VARCHAR); // whiteUsername
+                stmt.setNull(3, Types.VARCHAR); // blackUsername
+                stmt.setString(4, "{}"); // Assuming game data as an empty JSON object
+                int rowsInserted = stmt.executeUpdate();
+                System.out.println("Rows inserted: " + rowsInserted); // Debug statement
+
+                if (rowsInserted == 0) {
+                    conn.rollback();
+                    throw new DataAccessException("Creating game failed, no rows affected.");
+                }
+
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int gameID = generatedKeys.getInt(1);
+                        conn.commit();
+                        System.out.println("Created game with ID: " + gameID); // Debug statement
+                        return new GameData(gameID, null, null, gameName, new ChessGame());
+                    } else {
+                        conn.rollback();
+                        throw new DataAccessException("Creating game failed, no ID obtained.");
+                    }
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException(String.format("Unable to create game: %s", e.getMessage()));
+            throw new DataAccessException("Unable to create game: " + e.getMessage());
         }
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT id, gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameID=?";
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, gameID);
-                try (var rs = ps.executeQuery()) {
+        var statement = "SELECT * FROM games WHERE gameID = ?";
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement stmt = conn.prepareStatement(statement)) {
+                stmt.setInt(1, gameID);
+
+                try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
-                        return readGame(rs);
+                        String gameName = rs.getString("gameName");
+                        String whiteUsername = rs.getString("whiteUsername");
+                        String blackUsername = rs.getString("blackUsername");
+                        String gameDataJson = rs.getString("game");
+                        ChessGame game = new Gson().fromJson(gameDataJson, ChessGame.class);
+                        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+                    } else {
+                        throw new DataAccessException("Game not found with ID: " + gameID);
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new DataAccessException(format("Unable to read data: %s", e.getMessage()));
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to retrieve game: " + e.getMessage());
         }
-        return null;
     }
 
     @Override
     public void updateGame(GameData game) throws DataAccessException{
         var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
-        var json = new Gson().toJson(game.getGame());
-        executeUpdate(statement, game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), json, game.getGameID());
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement)) {
+            ps.setString(1, game.getWhiteUsername());
+            ps.setString(2, game.getBlackUsername());
+            ps.setString(3, game.getGameName());
+            ps.setString(4, new Gson().toJson(game.getGame()));
+            ps.setInt(5, game.getGameID());
+            int affectedRows = ps.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new DataAccessException("Game not found.");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to update database: " + e.getMessage());
+        }
     }
 
     @Override
     public Map<Integer, GameData> listGames() throws DataAccessException {
         var result = new HashMap<Integer, GameData>();
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT id, gameID, whiteUsername, blackUsername, gameName, game FROM games";
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games";
             try (var ps = conn.prepareStatement(statement)) {
                 try (var rs = ps.executeQuery()) {
                     while (rs.next()) {
                         var game = readGame(rs);
+                        System.out.println("Retrieved game from DB - ID: " + game.getGameID() + ", Name: " + game.getGameName());
                         result.put(game.getGameID(), game);
                     }
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(format("Unable to read data: %s", e.getMessage()));
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
         return result;
     }
@@ -214,6 +262,7 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
         var gameName = rs.getString("gameName");
         var json = rs.getString("game");
         var game = new Gson().fromJson(json, ChessGame.class);
+        System.out.println("Read game from ResultSet - ID: " + gameID + ", Name: " + gameName); // Debug statement
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
     }
 
@@ -222,25 +271,26 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {
                     var param = params[i];
-                    switch (param) {
-                        case String p -> ps.setString(i + 1, p);
-                        case Integer p -> ps.setInt(i + 1, p);
-                        case null -> ps.setNull(i + 1, NULL);
-                        default -> {
-                        }
+                    if (param == null) {
+                        ps.setNull(i + 1, Types.VARCHAR);
+                    } else if (param instanceof String) {
+                        ps.setString(i + 1, (String) param);
+                    } else if (param instanceof Integer) {
+                        ps.setInt(i + 1, (Integer) param);
                     }
                 }
-                ps.executeUpdate();
+                int affectedRows = ps.executeUpdate();
+                System.out.println("Affected Rows: " + affectedRows);
 
-                var rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
+                try (var rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
                 }
-
                 return 0;
             }
         } catch (SQLException e) {
-            throw new DataAccessException(format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException(format("Unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
 
@@ -256,13 +306,12 @@ public class MySqlDataAccess implements IGameDataDAO, IAuthDataDAO, IUserDataDAO
             """,
             """
             CREATE TABLE IF NOT EXISTS games (
-              id INT NOT NULL AUTO_INCREMENT,
-              gameID INT NOT NULL,
-              whiteUsername VARCHAR(50) NOT NULL,
-              blackUsername VARCHAR(50) NOT NULL,
+              gameID INT NOT NULL AUTO_INCREMENT,
+              whiteUsername VARCHAR(255) DEFAULT NULL,
+              blackUsername VARCHAR(255) DEFAULT NULL,
               gameName VARCHAR(50) NOT NULL,
               game TEXT NOT NULL,
-              PRIMARY KEY (id),
+              PRIMARY KEY (gameID),
               FOREIGN KEY (whiteUsername) REFERENCES users(username),
               FOREIGN KEY (blackUsername) REFERENCES users(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci

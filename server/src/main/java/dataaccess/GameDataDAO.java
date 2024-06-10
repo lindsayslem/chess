@@ -12,6 +12,7 @@ public class GameDataDAO implements IGameDataDAO {
     @Override
     public GameData createGame(String gameName) {
         int gameID = nextGameID++;
+
         GameData gameData = new GameData(gameID, null, null, gameName, null);
         gameDataMap.put(gameID, gameData);
         return gameData;
@@ -31,8 +32,9 @@ public class GameDataDAO implements IGameDataDAO {
         if (!gameDataMap.containsKey(game.getGameID())) {
             throw new DataAccessException("Game not found.");
         }
-
+        System.out.println("Updating game: " + game);
         gameDataMap.put(game.getGameID(), game);
+        System.out.println("Updated game: " + gameDataMap.get(game.getGameID()));
     }
 
     @Override

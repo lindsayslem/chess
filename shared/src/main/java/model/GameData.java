@@ -2,6 +2,8 @@ package model;
 
 import chess.ChessGame;
 
+import java.util.Objects;
+
 public class GameData {
     private final int gameID;
     private String whiteUsername;
@@ -9,7 +11,6 @@ public class GameData {
     private final String gameName;
     private final ChessGame game;
 
-    // Constructor
     public GameData(Integer gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
         this.gameID = gameID;
         this.whiteUsername = whiteUsername;
@@ -18,7 +19,6 @@ public class GameData {
         this.game = game;
     }
 
-    // Getters
     public int getGameID() {
         return gameID;
     }
@@ -39,7 +39,6 @@ public class GameData {
         return game;
     }
 
-    // Setters
     public void setWhiteUsername(String whiteUsername) {
         this.whiteUsername = whiteUsername;
     }
@@ -47,5 +46,6 @@ public class GameData {
     public void setBlackUsername(String blackUsername) {
         this.blackUsername = blackUsername;
     }
+
 
 }
