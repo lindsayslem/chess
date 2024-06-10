@@ -1,8 +1,6 @@
 package service;
 
-import dataaccess.GameDataDAO;
-import dataaccess.AuthDataDAO;
-import dataaccess.DataAccessException;
+import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 import chess.ChessGame;
@@ -11,8 +9,8 @@ import java.util.Collections;
 import java.util.Map;
 
 public class GameService {
-    private final GameDataDAO gameDataDAO;
-    private final AuthDataDAO authDataDAO;
+    private final IGameDataDAO gameDataDAO;
+    private final IAuthDataDAO authDataDAO;
 
     public GameService(GameDataDAO gameDataDAO, AuthDataDAO authDataDAO) {
         this.gameDataDAO = gameDataDAO;
@@ -24,7 +22,6 @@ public class GameService {
         AuthData authData = authDataDAO.getAuth(authToken);
 
         // Create game
-
         return gameDataDAO.createGame(gameData.getGameName());
     }
 

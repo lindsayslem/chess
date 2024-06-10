@@ -1,14 +1,11 @@
 package service;
 
-import dataaccess.AuthDataDAO;
-import dataaccess.GameDataDAO;
-import dataaccess.UserDataDAO;
-import dataaccess.DataAccessException;
+import dataaccess.*;
 
 public class ClearService {
-    private final UserDataDAO userDataDAO;
-    private final GameDataDAO gameDataDAO;
-    private final AuthDataDAO authDataDAO;
+    private final IUserDataDAO userDataDAO;
+    private final IGameDataDAO gameDataDAO;
+    private final IAuthDataDAO authDataDAO;
 
     public ClearService(UserDataDAO userDataDAO, GameDataDAO gameDataDAO, AuthDataDAO authDataDAO){
         this.userDataDAO = userDataDAO;
