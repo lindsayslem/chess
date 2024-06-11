@@ -6,8 +6,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
 
 import static dataaccess.DatabaseSetup.executeUpdate;
-import static java.lang.String.format;
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class MySqlUserDataDAO implements IUserDataDAO {
 
@@ -21,7 +19,7 @@ public class MySqlUserDataDAO implements IUserDataDAO {
         String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         int generatedId;
         try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+             var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
             conn.setAutoCommit(false);
             ps.setString(1, user.username());
             ps.setString(2, user.email());
@@ -56,11 +54,10 @@ public class MySqlUserDataDAO implements IUserDataDAO {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(format("Unable to read data: %s", e.getMessage()));
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
-        return null;
+        throw new DataAccessException("User not found.");
     }
-
 
     @Override
     public void clearUser() throws DataAccessException {

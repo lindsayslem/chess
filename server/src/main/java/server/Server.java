@@ -1,24 +1,21 @@
 package server;
 
-import spark.Spark;
+import dataaccess.*;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
-import dataaccess.AuthDataDAO;
-import dataaccess.GameDataDAO;
-import dataaccess.UserDataDAO;
+import spark.Spark;
 
 
 public class Server {
-    public int run(int desiredPort) {
+    public int run(int desiredPort) throws DataAccessException {
         Spark.port(desiredPort);
-
         Spark.staticFiles.location("web");
 
         // Initialize the DAOs
-        UserDataDAO userDataDAO = new UserDataDAO();
-        GameDataDAO gameDataDAO = new GameDataDAO();
-        AuthDataDAO authDataDAO = new AuthDataDAO();
+        MySqlUserDataDAO userDataDAO = new MySqlUserDataDAO();
+        MySqlGameDataDAO gameDataDAO = new MySqlGameDataDAO();
+        MySqlAuthDataDAO authDataDAO = new MySqlAuthDataDAO();
 
         // Initialize the service classes with the DAOs
         UserService userService = new UserService(userDataDAO, authDataDAO);

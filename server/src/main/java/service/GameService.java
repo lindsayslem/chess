@@ -12,7 +12,7 @@ public class GameService {
     private final IGameDataDAO gameDataDAO;
     private final IAuthDataDAO authDataDAO;
 
-    public GameService(GameDataDAO gameDataDAO, AuthDataDAO authDataDAO) {
+    public GameService(IGameDataDAO gameDataDAO, IAuthDataDAO authDataDAO) {
         this.gameDataDAO = gameDataDAO;
         this.authDataDAO = authDataDAO;
     }

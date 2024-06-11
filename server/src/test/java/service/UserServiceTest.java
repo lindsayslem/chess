@@ -1,43 +1,43 @@
 package service;
 
-import dataaccess.AuthDataDAO;
-import dataaccess.UserDataDAO;
-import dataaccess.DataAccessException;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
     private UserService userService;
-    private TestUserDataDAO userDataDAO;
-    private TestAuthData1DAO authDataDAO;
+    private IUserDataDAO userDataDAO;
+    private IAuthDataDAO authDataDAO;
 
     @BeforeEach
-    public void setUp() {
-        userDataDAO = new TestUserDataDAO();
-        authDataDAO = new TestAuthData1DAO();
+    public void setUp() throws DataAccessException {
+        userDataDAO = new MySqlUserDataDAO();
+        authDataDAO = new MySqlAuthDataDAO();
         userService = new UserService(userDataDAO, authDataDAO);
+
+        userDataDAO.clearUser();
+        authDataDAO.clearAuth();
     }
 
     @Test
-    public void registerSuccess() throws DataAccessException{
+    public void registerSuccess() throws DataAccessException {
         UserData user = new UserData("username", "password", "email");
-        userDataDAO.setUser(null);
 
         AuthData authData = userService.register(user);
 
         assertNotNull(authData);
-        assertEquals(user, userDataDAO.getUser("username"));
+        assertNotNull(userDataDAO.getUser("username"));
     }
 
     @Test
-    public void registerFailure() throws DataAccessException{
-        //user already exists
+    public void registerFailure() throws DataAccessException {
         UserData user = new UserData("username", "password", "email");
-        userDataDAO.setUser(user);
+        userDataDAO.createUser(user);
 
         assertThrows(DataAccessException.class, () -> userService.register(user));
     }
@@ -45,88 +45,39 @@ public class UserServiceTest {
     @Test
     public void loginSuccess() throws DataAccessException {
         UserData user = new UserData("username", "password", "email");
-        userDataDAO.setUser(user);
+        userService.register(user);
 
-        AuthData authData = userService.login(user);
+        AuthData authData = userService.login(new UserData("username", "password", "email"));
 
         assertNotNull(authData);
     }
 
     @Test
     public void loginFailure() throws DataAccessException {
-        // wrong password login
-        UserData user = new UserData("username", "password", "email");
-        UserData storedUser = new UserData("username", "wrongPassword", "email");
-        userDataDAO.setUser(storedUser);
+        UserData storedUser = new UserData("username", BCrypt.hashpw("correctPassword", BCrypt.gensalt()), "email");
+        userDataDAO.createUser(storedUser);
 
-        assertThrows(DataAccessException.class, () -> userService.login(user));
+        UserData loginUser = new UserData("username", "wrongPassword", "email");
+
+        assertThrows(DataAccessException.class, () -> userService.login(loginUser));
     }
 
     @Test
     public void logoutSuccessAndFailure() throws DataAccessException {
+        String username = "username";
         String authToken = "randomAuthToken";
-        authDataDAO.setAuth(new AuthData(authToken, "username"));
 
+        // Ensure the user exists in the users table
+        userDataDAO.createUser(new UserData(username, "password", "email"));
+
+        // Create auth token for the user
+        authDataDAO.createAuth(new AuthData(authToken, username));
+
+        // Logout the user and verify the auth token is removed
         assertDoesNotThrow(() -> userService.logout(authToken));
         assertNull(authDataDAO.getAuth(authToken));
 
-        // already logged out
+        // Attempt to logout again and verify it fails
         assertThrows(DataAccessException.class, () -> userService.logout(authToken));
-    }
-}
-
-class TestUserDataDAO extends UserDataDAO{
-    private UserData user;
-
-    public void setUser(UserData user){
-        this.user = user;
-    }
-
-    @Override
-    public UserData getUser(String username) throws DataAccessException{
-        if(user != null && user.username().equals(username)){
-            return user;
-        }
-        throw new DataAccessException("User not found");
-    }
-
-    @Override
-    public UserData createUser(UserData user) throws DataAccessException{
-        if(this.user != null && this.user.username().equals(user.username())){
-            throw new DataAccessException("User already exists");
-        }
-        this.user = user;
-        return user;
-    }
-}
-
-class TestAuthData1DAO extends AuthDataDAO{
-    private AuthData authData;
-
-    public void  setAuth(AuthData authData){
-        this.authData = authData;
-    }
-
-    @Override
-    public AuthData getAuth(String authToken) throws DataAccessException{
-        if(authData != null && authData.authToken().equals(authToken)){
-            return authData;
-        }
-        return null;
-    }
-
-    @Override
-    public void createAuth(AuthData authData) throws DataAccessException{
-        this.authData = authData;
-    }
-
-    @Override
-    public void deleteAuth(String authToken) throws DataAccessException{
-        if(authData != null && authData.authToken().equals(authToken)){
-            authData = null;
-        }
-        else{
-            throw new DataAccessException("Auth token not found");
-        }
     }
 }

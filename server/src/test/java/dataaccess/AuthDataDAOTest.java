@@ -4,8 +4,6 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 
-import java.sql.SQLException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AuthDataDAOTest {
@@ -43,21 +41,17 @@ public class AuthDataDAOTest {
     @DisplayName("Create Auth - Duplicate")
     public void createAuthNegative() throws DataAccessException {
         UserData user = new UserData("testUser", "testPassword", "testUser@example.com");
-        try {
-            userDAO.createUser(user);
-        } catch (DataAccessException e) {
-            fail("Setup failed: Unable to create user for negative test.");
-        }
+        userDAO.createUser(user);
 
         AuthData auth = new AuthData("testAuthToken", "testUser");
-        try {
+        authDao.createAuth(auth);
+
+        Exception exception = assertThrows(DataAccessException.class, () -> {
             authDao.createAuth(auth);
-            authDao.createAuth(auth); // This should fail
-            fail("Expected DataAccessException was not thrown.");
-        } catch (DataAccessException e) {
-            assertTrue(e.getMessage().contains("Duplicate entry") || e.getMessage().contains("Auth token already exists"),
-                    "Exception message should indicate that the auth token already exists.");
-        }
+        });
+
+        assertTrue(exception.getMessage().contains("Unable to update database") || exception.getMessage().contains("Duplicate entry"),
+                "Exception message should indicate that the auth token already exists.");
     }
 
     @Test
@@ -95,7 +89,6 @@ public class AuthDataDAOTest {
 
         AuthData retrievedAuth = authDao.getAuth("testAuthToken");
         assertNull(retrievedAuth, "Auth token should be deleted and retrieval should return null.");
-
     }
 
     @Test
@@ -129,5 +122,3 @@ public class AuthDataDAOTest {
         assertNull(authDao.getAuth("testAuthToken2"), "Auth token 2 should be cleared.");
     }
 }
-
-

@@ -7,7 +7,7 @@ public class ClearService {
     private final IGameDataDAO gameDataDAO;
     private final IAuthDataDAO authDataDAO;
 
-    public ClearService(UserDataDAO userDataDAO, GameDataDAO gameDataDAO, AuthDataDAO authDataDAO){
+    public ClearService(IUserDataDAO userDataDAO, IGameDataDAO gameDataDAO, IAuthDataDAO authDataDAO){
         this.userDataDAO = userDataDAO;
         this.gameDataDAO = gameDataDAO;
         this.authDataDAO = authDataDAO;

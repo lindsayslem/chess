@@ -64,13 +64,12 @@ public class UserDataDAOTest {
     @Test
     @DisplayName("Get user - nonexistent")
     public void getUserNegative() throws DataAccessException {
-        assertNull(userDAO.getUser("nonexistent"));
+        assertThrows(DataAccessException.class, () -> userDAO.getUser("nonexistent"));
     }
 
     @Test
     @DisplayName("Clear User - Positive")
     public void clearUserPositive() throws DataAccessException {
-        // Arrange: Create a user, create auth data, and create games
         UserData user = new UserData("testUser", "testPassword", "test@mail.com");
         userDAO.createUser(user);
 
@@ -86,7 +85,8 @@ public class UserDataDAOTest {
         // Assert: Verify that the tables are empty
         assertTrue(gameDao.listGames().isEmpty(), "The games list should be empty after clearing.");
         assertNull(authDao.getAuth(auth.authToken()), "The auth data should be null after clearing.");
-        assertNull(userDAO.getUser(user.username()), "The user data should be null after clearing.");
-    }
 
+        // Instead of asserting null, check for DataAccessException
+        assertThrows(DataAccessException.class, () -> userDAO.getUser(user.username()), "The user data should be null after clearing.");
+    }
 }

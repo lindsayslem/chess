@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;
 
@@ -10,7 +11,7 @@ public class UserService {
     private final IUserDataDAO userDataDAO;
     private final IAuthDataDAO authDataDAO;
 
-    public UserService(UserDataDAO userDataDAO, AuthDataDAO authDataDAO) {
+    public UserService(IUserDataDAO userDataDAO, IAuthDataDAO authDataDAO) {
         this.userDataDAO = userDataDAO;
         this.authDataDAO = authDataDAO;
     }
@@ -22,6 +23,9 @@ public class UserService {
             throw new DataAccessException("Username already taken");
         } catch (DataAccessException e) {
             // Username does not exist, proceed with registration
+            if (!e.getMessage().contains("User not found")) {
+                throw e;
+            }
         }
 
         // Register user
@@ -38,7 +42,7 @@ public class UserService {
     public AuthData login(UserData user) throws DataAccessException {
         // Verify user credentials
         UserData storedUser = userDataDAO.getUser(user.username());
-        if (!storedUser.password().equals(user.password())) {
+        if (storedUser == null || !BCrypt.checkpw(user.password(), storedUser.password())) {
             throw new DataAccessException("Unauthorized");
         }
 
@@ -54,5 +58,4 @@ public class UserService {
         // Delete auth token
         authDataDAO.deleteAuth(authToken);
     }
-
 }
