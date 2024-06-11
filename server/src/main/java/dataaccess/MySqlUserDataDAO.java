@@ -17,7 +17,6 @@ public class MySqlUserDataDAO implements IUserDataDAO {
     public UserData createUser(UserData user) throws DataAccessException {
         var statement = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
         String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-        int generatedId;
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
             conn.setAutoCommit(false);
@@ -28,7 +27,7 @@ public class MySqlUserDataDAO implements IUserDataDAO {
 
             try (var rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
-                    generatedId = rs.getInt(1);
+                    rs.getInt(1);
                 } else {
                     conn.rollback();
                     throw new DataAccessException(String.format("Unable to generate key for user: %s", user.username()));
@@ -43,20 +42,26 @@ public class MySqlUserDataDAO implements IUserDataDAO {
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT username, password, email FROM users WHERE username=?";
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, username);
-                try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return readUser(rs);
-                    }
+        UserData user = null;
+        String sql = "SELECT * FROM users WHERE username = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    user = new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
                 }
             }
-        } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        } catch (SQLException e) {
+            throw new DataAccessException("Error occurred while getting user");
         }
-        throw new DataAccessException("User not found.");
+
+        if (user == null) {
+            throw new DataAccessException("User not found.");
+        }
+        return user;
     }
 
     @Override
