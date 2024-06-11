@@ -3,16 +3,15 @@ package ui;
 import java.util.List;
 import java.util.Scanner;
 import model.GameData;  // Import the GameData class
-import ui.PreloginUI;
 
 public class PostloginUI {
-    private ui.ServerFacade serverFacade;
+    private ServerFacade serverFacade;
     private Scanner scanner;
     private String authToken;
     private String username;
     private List<GameData> gameList;
 
-    public PostloginUI(ui.ServerFacade serverFacade, Scanner scanner, String authToken, String username) {
+    public PostloginUI(ServerFacade serverFacade, Scanner scanner, String authToken, String username) {
         this.serverFacade = serverFacade;
         this.scanner = scanner;
         this.authToken = authToken;
@@ -105,6 +104,8 @@ public class PostloginUI {
             System.out.println("No games available. Use 'list' to see available games.");
             return;
         }
+        System.out.print("Enter game ID to observe: ");
+        int gameId = Integer.parseInt(scanner.nextLine());
+        serverFacade.observeGame(authToken, gameId);
     }
 }
-

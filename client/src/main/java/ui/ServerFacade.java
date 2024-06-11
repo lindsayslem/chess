@@ -4,24 +4,27 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 import model.GameData;
 
 public class ServerFacade {
     private final String serverUrl;
     private final HttpClient client;
-    private final ObjectMapper objectMapper;
+    private final Gson gson;
 
     public ServerFacade(String serverUrl) {
         this.serverUrl = serverUrl;
         this.client = HttpClient.newHttpClient();
-        this.objectMapper = new ObjectMapper();
+        this.gson = new Gson();
     }
 
     public String register(String username, String password, String email) {
         try {
-            String requestBody = String.format("{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\"}", username, password, email);
+            String requestBody = gson.toJson(new RegisterRequest(username, password, email));
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(serverUrl + "/register"))
                     .header("Content-Type", "application/json")
@@ -40,7 +43,7 @@ public class ServerFacade {
 
     public String login(String username, String password) {
         try {
-            String requestBody = String.format("{\"username\":\"%s\",\"password\":\"%s\"}", username, password);
+            String requestBody = gson.toJson(new LoginRequest(username, password));
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(serverUrl + "/login"))
                     .header("Content-Type", "application/json")
@@ -73,7 +76,7 @@ public class ServerFacade {
 
     public void createGame(String authToken, String gameName) {
         try {
-            String requestBody = String.format("{\"name\":\"%s\"}", gameName);
+            String requestBody = gson.toJson(new CreateGameRequest(gameName));
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(serverUrl + "/games"))
                     .header("Authorization", "Bearer " + authToken)
@@ -97,7 +100,8 @@ public class ServerFacade {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                return objectMapper.readValue(response.body(), objectMapper.getTypeFactory().constructCollectionType(List.class, GameData.class));
+                Type gameListType = new TypeToken<ArrayList<GameData>>() {}.getType();
+                return gson.fromJson(response.body(), gameListType);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,7 +111,7 @@ public class ServerFacade {
 
     public void joinGame(String authToken, int gameId, String color) {
         try {
-            String requestBody = String.format("{\"gameId\":%d,\"color\":\"%s\"}", gameId, color);
+            String requestBody = gson.toJson(new JoinGameRequest(gameId, color));
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(serverUrl + "/games/join"))
                     .header("Authorization", "Bearer " + authToken)
@@ -123,7 +127,7 @@ public class ServerFacade {
 
     public void observeGame(String authToken, int gameId) {
         try {
-            String requestBody = String.format("{\"gameId\":%d}", gameId);
+            String requestBody = gson.toJson(new ObserveGameRequest(gameId));
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(serverUrl + "/games/observe"))
                     .header("Authorization", "Bearer " + authToken)
@@ -134,6 +138,55 @@ public class ServerFacade {
             client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    // Helper classes for request bodies
+    private static class RegisterRequest {
+        String username;
+        String password;
+        String email;
+
+        RegisterRequest(String username, String password, String email) {
+            this.username = username;
+            this.password = password;
+            this.email = email;
+        }
+    }
+
+    private static class LoginRequest {
+        String username;
+        String password;
+
+        LoginRequest(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+    }
+
+    private static class CreateGameRequest {
+        String name;
+
+        CreateGameRequest(String name) {
+            this.name = name;
+        }
+    }
+
+    private static class JoinGameRequest {
+        int gameId;
+        String color;
+
+        JoinGameRequest(int gameId, String color) {
+            this.gameId = gameId;
+            this.color = color;
+        }
+    }
+
+    private static class ObserveGameRequest {
+        int gameId;
+
+        ObserveGameRequest(int gameId) {
+            this.gameId = gameId;
         }
     }
 }
