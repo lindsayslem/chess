@@ -45,6 +45,10 @@ public class MySqlUserDataDAO implements IUserDataDAO {
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
+        return getUserData(username);
+    }
+
+    static UserData getUserData(String username) throws DataAccessException {
         UserData user = null;
         String sql = "SELECT * FROM users WHERE username = ?";
 
@@ -79,11 +83,5 @@ public class MySqlUserDataDAO implements IUserDataDAO {
             throw new DataAccessException(String.format("Unable to clear user data: %s", e.getMessage()));
         }
     }
-
-    private UserData readUser(ResultSet rs) throws SQLException {
-        var username = rs.getString("username");
-        var password = rs.getString("password");
-        var email = rs.getString("email");
-        return new UserData(username, password, email);
-    }
+    
 }
