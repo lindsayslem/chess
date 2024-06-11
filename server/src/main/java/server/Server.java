@@ -8,8 +8,22 @@ import spark.Spark;
 
 public class Server {
     private boolean initialized = false;
+    UserService userService;
+    GameService gameService;
+    ClearService clearService;
 
-    public int run(int desiredPort) throws DataAccessException {
+
+    public Server(){
+        MySqlUserDataDAO userDataDAO = new MySqlUserDataDAO();
+        MySqlGameDataDAO gameDataDAO = new MySqlGameDataDAO();
+        MySqlAuthDataDAO authDataDAO = new MySqlAuthDataDAO();
+
+        userService = new UserService(userDataDAO, authDataDAO);
+        gameService = new GameService(gameDataDAO, authDataDAO);
+        clearService = new ClearService(userDataDAO, gameDataDAO, authDataDAO);
+    }
+
+    public int run(int desiredPort) {
         if (initialized) {
             Spark.stop();
             initialized = false;
@@ -17,16 +31,6 @@ public class Server {
 
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
-
-        // Initialize the DAOs
-        MySqlUserDataDAO userDataDAO = new MySqlUserDataDAO();
-        MySqlGameDataDAO gameDataDAO = new MySqlGameDataDAO();
-        MySqlAuthDataDAO authDataDAO = new MySqlAuthDataDAO();
-
-        // Initialize the service classes with the DAOs
-        UserService userService = new UserService(userDataDAO, authDataDAO);
-        GameService gameService = new GameService(gameDataDAO, authDataDAO);
-        ClearService clearService = new ClearService(userDataDAO, gameDataDAO, authDataDAO);
 
         // Register the endpoints with their respective handlers
         Spark.post("/user", new RegisterHandler(userService));

@@ -12,8 +12,11 @@ import static dataaccess.DatabaseSetup.executeUpdate;
 
 public class MySqlGameDataDAO implements IGameDataDAO {
 
-    public MySqlGameDataDAO() throws DataAccessException {
-        DatabaseSetup.configureDatabase();
+    public MySqlGameDataDAO() {
+        try {DatabaseSetup.configureDatabase();}
+        catch (DataAccessException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override

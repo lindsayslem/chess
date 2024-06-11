@@ -9,8 +9,11 @@ import static dataaccess.DatabaseSetup.executeUpdate;
 
 public class MySqlUserDataDAO implements IUserDataDAO {
 
-    public MySqlUserDataDAO() throws DataAccessException {
-        DatabaseSetup.configureDatabase();
+    public MySqlUserDataDAO() {
+        try {DatabaseSetup.configureDatabase();}
+            catch (DataAccessException e) {
+            System.out.println(e.getMessage());
+            }
     }
 
     @Override
