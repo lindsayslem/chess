@@ -1,7 +1,6 @@
 package passoff.server;
 
 import chess.ChessGame;
-import dataaccess.DataAccessException;
 import org.junit.jupiter.api.*;
 import passoff.model.*;
 import server.Server;
@@ -32,7 +31,7 @@ public class StandardAPITests {
     }
 
     @BeforeAll
-    public static void init() throws DataAccessException {
+    public static void init() {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
@@ -388,7 +387,7 @@ public class StandardAPITests {
         serverFacade.createGame(new TestCreateRequest("Awesome game"), existingAuth);
 
         //log in new user
-        TestUser user = new TestUser("ClearMe", "cleared", "clearUser@mail.com");
+        TestUser user = new TestUser("ClearMe", "cleared", "clear@mail.com");
         TestAuthResult registerResult = serverFacade.register(user);
 
         //create and join game for new user
@@ -398,10 +397,10 @@ public class StandardAPITests {
         TestJoinRequest joinRequest = new TestJoinRequest(ChessGame.TeamColor.WHITE, createResult.getGameID());
         serverFacade.joinPlayer(joinRequest, registerResult.getAuthToken());
 
-        //do clearUser
+        //do clear
         TestResult clearResult = serverFacade.clear();
 
-        //test clearUser successful
+        //test clear successful
         assertHttpOk(clearResult);
 
         //make sure neither user can log in
@@ -424,7 +423,7 @@ public class StandardAPITests {
         assertHttpOk(listResult);
 
         //check listResult
-        Assertions.assertEquals(0, listResult.getGames().length, "list result did not return 0 games after clearUser");
+        Assertions.assertEquals(0, listResult.getGames().length, "list result did not return 0 games after clear");
     }
 
     @Test
@@ -432,7 +431,7 @@ public class StandardAPITests {
     @DisplayName("Multiple Clears")
     public void multipleClear() {
 
-        //clearUser multiple times
+        //clear multiple times
         serverFacade.clear();
         serverFacade.clear();
         TestResult result = serverFacade.clear();
@@ -475,4 +474,3 @@ public class StandardAPITests {
     }
 
 }
-

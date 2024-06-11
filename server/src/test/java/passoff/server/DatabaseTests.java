@@ -1,7 +1,6 @@
 package passoff.server;
 
 import chess.ChessGame;
-import dataaccess.DataAccessException;
 import org.junit.jupiter.api.*;
 import passoff.model.*;
 import server.Server;
@@ -19,7 +18,7 @@ public class DatabaseTests {
 
 
     @BeforeAll
-    public static void startServer() throws DataAccessException {
+    public static void startServer() {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
@@ -42,7 +41,7 @@ public class DatabaseTests {
     @Test
     @DisplayName("Persistence Test")
     @Order(1)
-    public void persistenceTest() throws DataAccessException {
+    public void persistenceTest() {
         int initialRowCount = getDatabaseRows();
 
         TestUser user = new TestUser("ExistingUser", "existingUserPassword", "eu@mail.com");
@@ -98,7 +97,7 @@ public class DatabaseTests {
                             for(int i = 1; i <= columnsNumber; i++) {
                                 String value = rs.getString(i);
                                 Assertions.assertFalse(value.contains(clearTextPassword),
-                                        "Found clearUser text password in database");
+                                        "Found clear text password in database");
                             }
                         }
                     }
