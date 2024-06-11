@@ -6,9 +6,15 @@ import service.GameService;
 import service.UserService;
 import spark.Spark;
 
-
 public class Server {
+    private boolean initialized = false;
+
     public int run(int desiredPort) throws DataAccessException {
+        if (initialized) {
+            Spark.stop();
+            initialized = false;
+        }
+
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
@@ -32,10 +38,15 @@ public class Server {
         Spark.delete("/session", new LogoutHandler(userService));
 
         Spark.awaitInitialization();
+        initialized = true;
         return Spark.port();
     }
 
     public void stop() {
-        Spark.stop();
+        if (initialized) {
+            Spark.stop();
+            Spark.awaitStop(); // Ensure Spark is fully stopped
+            initialized = false;
+        }
     }
 }
