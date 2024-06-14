@@ -20,7 +20,7 @@ public class CreateGameHandler implements Route {
     @Override
     public Object handle(Request request, Response response) {
         try {
-            String authToken = request.headers("authorization");
+            String authToken = request.headers("Authorization").replace("Bearer ", "");
             GameData gameData = gson.fromJson(request.body(), GameData.class);
             GameData createdGame = gameService.createGame(gameData, authToken);
             response.status(200);

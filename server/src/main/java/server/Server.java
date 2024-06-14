@@ -1,6 +1,8 @@
 package server;
 
-import dataaccess.*;
+import dataaccess.MySqlAuthDataDAO;
+import dataaccess.MySqlGameDataDAO;
+import dataaccess.MySqlUserDataDAO;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -12,8 +14,7 @@ public class Server {
     GameService gameService;
     ClearService clearService;
 
-
-    public Server(){
+    public Server() {
         MySqlUserDataDAO userDataDAO = new MySqlUserDataDAO();
         MySqlGameDataDAO gameDataDAO = new MySqlGameDataDAO();
         MySqlAuthDataDAO authDataDAO = new MySqlAuthDataDAO();
@@ -32,7 +33,6 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
-        // Register the endpoints with their respective handlers
         Spark.post("/user", new RegisterHandler(userService));
         Spark.delete("/db", new ClearHandler(clearService));
         Spark.post("/game", new CreateGameHandler(gameService));
@@ -40,6 +40,7 @@ public class Server {
         Spark.get("/game", new ListGamesHandler(gameService));
         Spark.post("/session", new LoginHandler(userService));
         Spark.delete("/session", new LogoutHandler(userService));
+
 
         Spark.awaitInitialization();
         initialized = true;
@@ -49,7 +50,7 @@ public class Server {
     public void stop() {
         if (initialized) {
             Spark.stop();
-            Spark.awaitStop(); // Ensure Spark is fully stopped
+            Spark.awaitStop();
             initialized = false;
         }
     }

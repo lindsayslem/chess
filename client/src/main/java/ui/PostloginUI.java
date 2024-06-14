@@ -1,6 +1,6 @@
 package ui;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import model.GameData;  // Import the GameData class
 
@@ -9,7 +9,7 @@ public class PostloginUI {
     private Scanner scanner;
     private String authToken;
     private String username;
-    private List<GameData> gameList;
+    private Map<Integer, GameData> gameList;
 
     public PostloginUI(ServerFacade serverFacade, Scanner scanner, String authToken, String username) {
         this.serverFacade = serverFacade;
@@ -45,6 +45,9 @@ public class PostloginUI {
                     break;
                 case "quit":
                     System.exit(0);
+                case "play":
+                    playGame();
+                    break;
                 default:
                     System.out.println("Invalid command. Type 'help' to see the list of available commands.");
             }
@@ -52,13 +55,14 @@ public class PostloginUI {
     }
 
     private void showHelp() {
-        System.out.println("create <NAME> - a game");
-        System.out.println("list - games");
-        System.out.println("join <ID> [WHITE|BLACK] - a game");
-        System.out.println("observe <ID> - a game");
-        System.out.println("logout - when you are done");
-        System.out.println("quit - playing chess");
-        System.out.println("help - with possible commands");
+        System.out.println("create <NAME> - create a game");
+        System.out.println("list - list games");
+        System.out.println("join <ID> [WHITE|BLACK] - join a game");
+        System.out.println("observe <ID> - observe a game");
+        System.out.println("play - start playing the game");
+        System.out.println("logout - log out");
+        System.out.println("quit - exit the application");
+        System.out.println("help - display help");
     }
 
     private void logout() {
@@ -78,9 +82,9 @@ public class PostloginUI {
         gameList = serverFacade.listGames(authToken);
         if (gameList != null) {
             System.out.println("Available games:");
-            for (int i = 0; i < gameList.size(); i++) {
-                GameData game = gameList.get(i);
-                System.out.printf("%d. %s (Players: %s)\n", i + 1, game.getGameName(), game.getWhiteUsername(), game.getBlackUsername());
+            for (Map.Entry<Integer, GameData> entry : gameList.entrySet()) {
+                GameData game = entry.getValue();
+                System.out.printf("%d. %s (White: %s, Black: %s)\n", entry.getKey(), game.getGameName(), game.getWhiteUsername(), game.getBlackUsername());
             }
         } else {
             System.out.println("Failed to list games.");
@@ -107,5 +111,10 @@ public class PostloginUI {
         System.out.print("Enter game ID to observe: ");
         int gameId = Integer.parseInt(scanner.nextLine());
         serverFacade.observeGame(authToken, gameId);
+        GameplayUI.drawBoard();
+    }
+
+    private void playGame() {
+        GameplayUI.drawBoard();
     }
 }

@@ -4,11 +4,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.util.Map;
 import model.GameData;
 
 public class ServerFacade {
@@ -24,9 +23,9 @@ public class ServerFacade {
 
     public String register(String username, String password, String email) {
         try {
-            String requestBody = gson.toJson(new RegisterRequest(username, password, email));
+            String requestBody = String.format("{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\"}", username, password, email);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(serverUrl + "/register"))
+                    .uri(new URI(serverUrl + "/user"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
@@ -45,7 +44,7 @@ public class ServerFacade {
         try {
             String requestBody = gson.toJson(new LoginRequest(username, password));
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(serverUrl + "/login"))
+                    .uri(new URI(serverUrl + "/session"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
@@ -63,7 +62,7 @@ public class ServerFacade {
     public void logout(String authToken) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(serverUrl + "/logout"))
+                    .uri(new URI(serverUrl + "/session"))
                     .header("Authorization", "Bearer " + authToken)
                     .POST(HttpRequest.BodyPublishers.noBody())
                     .build();
@@ -78,30 +77,32 @@ public class ServerFacade {
         try {
             String requestBody = gson.toJson(new CreateGameRequest(gameName));
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(serverUrl + "/games"))
+                    .uri(new URI(serverUrl + "/game"))
                     .header("Authorization", "Bearer " + authToken)
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
-            client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("Create game response status: " + response.statusCode());
+            System.out.println("Create game response body: " + response.body());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public List<GameData> listGames(String authToken) {
+    public Map<Integer, GameData> listGames(String authToken) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(serverUrl + "/games"))
+                    .uri(new URI(serverUrl + "/game"))
                     .header("Authorization", "Bearer " + authToken)
                     .GET()
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                Type gameListType = new TypeToken<ArrayList<GameData>>() {}.getType();
-                return gson.fromJson(response.body(), gameListType);
+                Type gameMapType = new TypeToken<Map<Integer, GameData>>() {}.getType();
+                return gson.fromJson(response.body(), gameMapType);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,7 +114,7 @@ public class ServerFacade {
         try {
             String requestBody = gson.toJson(new JoinGameRequest(gameId, color));
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(serverUrl + "/games/join"))
+                    .uri(new URI(serverUrl + "/game"))
                     .header("Authorization", "Bearer " + authToken)
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -129,7 +130,7 @@ public class ServerFacade {
         try {
             String requestBody = gson.toJson(new ObserveGameRequest(gameId));
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(serverUrl + "/games/observe"))
+                    .uri(new URI(serverUrl + "/observe"))
                     .header("Authorization", "Bearer " + authToken)
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
