@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.AuthDataDAO;
-import dataaccess.DataAccessException;
-import dataaccess.GameDataDAO;
-import dataaccess.UserDataDAO;
+import dataaccess.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,10 +10,10 @@ class ClearServiceTest {
     private ClearService clearService;
 
     @BeforeEach
-    public void setUp() {
-        UserDataDAO userDataDAO = new UserDataDAO();
-        GameDataDAO gameDataDAO = new GameDataDAO();
-        AuthDataDAO authDataDAO = new AuthDataDAO();
+    public void setUp() throws DataAccessException {
+        MySqlUserDataDAO userDataDAO = new MySqlUserDataDAO();
+        MySqlGameDataDAO gameDataDAO = new MySqlGameDataDAO();
+        MySqlAuthDataDAO authDataDAO = new MySqlAuthDataDAO();
         clearService = new ClearService(userDataDAO, gameDataDAO, authDataDAO);
     }
 
@@ -27,7 +24,7 @@ class ClearServiceTest {
     }
 
     @Test
-    public void clearFailure() {
+    public void clearFailure() throws DataAccessException {
         // mock DAO
         UserDataDAO testUserDataDAO = new UserDataDAO() {
             @Override
@@ -36,8 +33,8 @@ class ClearServiceTest {
             }
         };
 
-        GameDataDAO testGameDataDAO = new GameDataDAO();
-        AuthDataDAO testAuthDataDAO = new AuthDataDAO();
+        MySqlGameDataDAO testGameDataDAO = new MySqlGameDataDAO();
+        MySqlAuthDataDAO testAuthDataDAO = new MySqlAuthDataDAO();
         ClearService testClearService = new ClearService(testUserDataDAO, testGameDataDAO, testAuthDataDAO);
 
         DataAccessException exception = assertThrows(DataAccessException.class, testClearService::clear);

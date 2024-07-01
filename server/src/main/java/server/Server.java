@@ -1,31 +1,38 @@
 package server;
 
-import spark.Spark;
+import dataaccess.MySqlAuthDataDAO;
+import dataaccess.MySqlGameDataDAO;
+import dataaccess.MySqlUserDataDAO;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
-import dataaccess.AuthDataDAO;
-import dataaccess.GameDataDAO;
-import dataaccess.UserDataDAO;
-
+import spark.Spark;
 
 public class Server {
-    public int run(int desiredPort) {
-        Spark.port(desiredPort);
+    private boolean initialized = false;
+    UserService userService;
+    GameService gameService;
+    ClearService clearService;
 
+    public Server() {
+        MySqlUserDataDAO userDataDAO = new MySqlUserDataDAO();
+        MySqlGameDataDAO gameDataDAO = new MySqlGameDataDAO();
+        MySqlAuthDataDAO authDataDAO = new MySqlAuthDataDAO();
+
+        userService = new UserService(userDataDAO, authDataDAO);
+        gameService = new GameService(gameDataDAO, authDataDAO);
+        clearService = new ClearService(userDataDAO, gameDataDAO, authDataDAO);
+    }
+
+    public int run(int desiredPort) {
+        if (initialized) {
+            Spark.stop();
+            initialized = false;
+        }
+
+        Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
-        // Initialize the DAOs
-        UserDataDAO userDataDAO = new UserDataDAO();
-        GameDataDAO gameDataDAO = new GameDataDAO();
-        AuthDataDAO authDataDAO = new AuthDataDAO();
-
-        // Initialize the service classes with the DAOs
-        UserService userService = new UserService(userDataDAO, authDataDAO);
-        GameService gameService = new GameService(gameDataDAO, authDataDAO);
-        ClearService clearService = new ClearService(userDataDAO, gameDataDAO, authDataDAO);
-
-        // Register the endpoints with their respective handlers
         Spark.post("/user", new RegisterHandler(userService));
         Spark.delete("/db", new ClearHandler(clearService));
         Spark.post("/game", new CreateGameHandler(gameService));
@@ -34,11 +41,17 @@ public class Server {
         Spark.post("/session", new LoginHandler(userService));
         Spark.delete("/session", new LogoutHandler(userService));
 
+
         Spark.awaitInitialization();
+        initialized = true;
         return Spark.port();
     }
 
     public void stop() {
-        Spark.stop();
+        if (initialized) {
+            Spark.stop();
+            Spark.awaitStop();
+            initialized = false;
+        }
     }
 }

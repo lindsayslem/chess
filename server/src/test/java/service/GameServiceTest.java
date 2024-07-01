@@ -1,11 +1,9 @@
 package service;
 
-import dataaccess.AuthDataDAO;
-import dataaccess.GameDataDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 import chess.ChessGame;
-import dataaccess.DataAccessException;
 import org.junit.jupiter.api.*;
 import java.util.*;
 
@@ -15,12 +13,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GameServiceTest {
 
     private GameService gameService;
-    private AuthDataDAO authDataDAO;
-    private GameDataDAO gameDataDAO;
-
+    private IAuthDataDAO authDataDAO;
+    private IGameDataDAO gameDataDAO;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws DataAccessException {
         authDataDAO = new AuthDataDAO();
         gameDataDAO = new GameDataDAO();
         gameService = new GameService(gameDataDAO, authDataDAO);
@@ -28,13 +25,12 @@ public class GameServiceTest {
 
     @Test
     public void createGameSuccess() throws DataAccessException {
-        // add valid auth data
+        // Add valid auth data
         AuthData authData = new AuthData("authToken1", "user1");
         authDataDAO.createAuth(authData);
 
-        // create a new game
-        GameData gameData = new GameData(1, null, null, "gameName", new ChessGame());
-        GameData result = gameService.createGame(gameData, authData.authToken());
+        // Create a new game
+        GameData result = gameService.createGame(new GameData(1, null, null, "gameName", new ChessGame()), authData.authToken());
 
         assertNotNull(result);
         assertEquals("gameName", result.getGameName());
@@ -42,11 +38,9 @@ public class GameServiceTest {
 
     @Test
     public void createGameFailure() {
-        // attempt to create a game with an invalid auth token
-        GameData gameData = new GameData(1, null, null, "gameName", new ChessGame());
-
+        // Attempt to create a game with an invalid auth token
         DataAccessException exception = assertThrows(DataAccessException.class, () -> {
-            gameService.createGame(gameData, "invalidToken");
+            gameService.createGame(new GameData(1, null, null, "gameName", new ChessGame()), "invalidToken");
         });
 
         assertEquals("Auth token not found.", exception.getMessage());
@@ -54,27 +48,26 @@ public class GameServiceTest {
 
     @Test
     public void joinGameSuccess() throws DataAccessException {
-        // join as white
+        // Join as white
         AuthData authData = new AuthData("authToken1", "user1");
         authDataDAO.createAuth(authData);
 
-        GameData gameData = new GameData(1, null, null, "gameName", new ChessGame());
-        gameDataDAO.createGame("gameName");
+        GameData gameData = gameDataDAO.createGame("gameName");
 
-        boolean result = gameService.joinGame(ChessGame.TeamColor.WHITE, 1, "authToken1");
+        boolean result = gameService.joinGame(ChessGame.TeamColor.WHITE, gameData.getGameID(), authData.authToken());
 
         assertTrue(result);
-        assertEquals("user1", gameDataDAO.getGame(1).getWhiteUsername());
+        assertEquals("user1", gameDataDAO.getGame(gameData.getGameID()).getWhiteUsername());
     }
 
     @Test
     public void joinGameFailure() throws DataAccessException {
-        // nonexistent game
+        // Nonexistent game
         AuthData authData = new AuthData("authToken4", "user4");
         authDataDAO.createAuth(authData);
 
         DataAccessException exception = assertThrows(DataAccessException.class, () -> {
-            gameService.joinGame(ChessGame.TeamColor.WHITE, 999, "authToken4");
+            gameService.joinGame(ChessGame.TeamColor.WHITE, 999, authData.authToken());
         });
 
         assertEquals("Game not found.", exception.getMessage());
@@ -82,17 +75,15 @@ public class GameServiceTest {
 
     @Test
     public void listGamesSuccess() throws DataAccessException {
-        // add valid auth data
+        // Add valid auth data
         AuthData authData = new AuthData("authToken4", "user4");
         authDataDAO.createAuth(authData);
 
-        // create games and add them to the DAO
-        GameData gameData1 = new GameData(4, "user4", null, "Game 1", new ChessGame());
-        GameData gameData2 = new GameData(5, null, "user4", "Game 2", new ChessGame());
-        gameDataDAO.createGame("Game1");
-        gameDataDAO.createGame("Game2");
+        // Create games and add them to the DAO
+        gameDataDAO.createGame("Game 1");
+        gameDataDAO.createGame("Game 2");
 
-        // list the games
+        // List the games
         Map<Integer, GameData> games = gameService.listGames(authData.authToken());
 
         assertNotNull(games);
@@ -101,12 +92,11 @@ public class GameServiceTest {
 
     @Test
     public void listGamesFailure() {
-        // attempt to list games with an invalid auth token
+        // Attempt to list games with an invalid auth token
         DataAccessException exception = assertThrows(DataAccessException.class, () -> {
             gameService.listGames("invalidToken");
         });
 
         assertEquals("Auth token not found.", exception.getMessage());
     }
-
 }

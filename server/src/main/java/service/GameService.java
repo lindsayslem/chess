@@ -1,8 +1,6 @@
 package service;
 
-import dataaccess.GameDataDAO;
-import dataaccess.AuthDataDAO;
-import dataaccess.DataAccessException;
+import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 import chess.ChessGame;
@@ -11,21 +9,26 @@ import java.util.Collections;
 import java.util.Map;
 
 public class GameService {
-    private final GameDataDAO gameDataDAO;
-    private final AuthDataDAO authDataDAO;
+    private final IGameDataDAO gameDataDAO;
+    private final IAuthDataDAO authDataDAO;
 
-    public GameService(GameDataDAO gameDataDAO, AuthDataDAO authDataDAO) {
+    public GameService(IGameDataDAO gameDataDAO, IAuthDataDAO authDataDAO) {
         this.gameDataDAO = gameDataDAO;
         this.authDataDAO = authDataDAO;
     }
 
     public GameData createGame(GameData gameData, String authToken) throws DataAccessException {
-        // Validate auth token
         AuthData authData = authDataDAO.getAuth(authToken);
+        if (authData == null) {
+            System.out.println("Error: unauthorized - Auth token is invalid");
+            throw new DataAccessException("Error: unauthorized");
+        }
+        System.out.println("Auth token is valid. Creating game...");
 
         // Create game
-
-        return gameDataDAO.createGame(gameData.getGameName());
+        GameData createdGame = gameDataDAO.createGame(gameData.getGameName());
+        System.out.println("Game created with ID: " + createdGame.getGameID());
+        return createdGame;
     }
 
     public boolean joinGame(ChessGame.TeamColor playerColor, int gameID, String authToken) throws DataAccessException {
