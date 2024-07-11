@@ -84,8 +84,6 @@ public class ServerFacade {
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Create game response status: " + response.statusCode());
-            System.out.println("Create game response body: " + response.body());
         } catch (Exception e) {
             e.printStackTrace();
         }

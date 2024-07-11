@@ -15,6 +15,7 @@ public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade facade;
+    private static ClearService clearService;
 
     @BeforeAll
     public static void init() {
@@ -22,22 +23,19 @@ public class ServerFacadeTests {
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade("http://localhost:" + port);
-
+        clearService = new ClearService(new MySqlUserDataDAO(), new MySqlGameDataDAO(), new MySqlAuthDataDAO());
     }
 
     @AfterAll
-    static void stopServer() {
+    public static void stopServer() {
         server.stop();
     }
 
     @BeforeEach
-    void clearDatabase() throws DataAccessException {
-        MySqlUserDataDAO userDataDAO = new MySqlUserDataDAO();
-        MySqlGameDataDAO gameDataDAO = new MySqlGameDataDAO();
-        MySqlAuthDataDAO authDataDAO = new MySqlAuthDataDAO();
-        ClearService clearService = new ClearService(userDataDAO, gameDataDAO, authDataDAO);
+    public void clearDatabase() throws Exception {
         clearService.clear();
     }
+
 
     @Test
     void registerPositive() throws Exception {
@@ -68,7 +66,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void createGamePositive() throws Exception {
+    public void createGamePositive() throws Exception {
         String authToken = facade.register("player1", "password", "p1@email.com");
         assertNotNull(authToken);
 
