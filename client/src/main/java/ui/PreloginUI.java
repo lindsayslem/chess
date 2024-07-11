@@ -1,7 +1,7 @@
 package ui;
 
 import java.util.Scanner;
-import dataaccess.*;
+
 
 public class PreloginUI {
     private ServerFacade serverFacade;
@@ -11,10 +11,6 @@ public class PreloginUI {
         this.serverFacade = serverFacade;
         this.scanner = scanner;
 
-
-        IUserDataDAO userDataDAO = new MySqlUserDataDAO();
-        IGameDataDAO gameDataDAO = new MySqlGameDataDAO();
-        IAuthDataDAO authDataDAO = new MySqlAuthDataDAO();
     }
 
     public void show(){
