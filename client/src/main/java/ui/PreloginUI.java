@@ -1,23 +1,16 @@
 package ui;
 
 import java.util.Scanner;
-import service.ClearService;
-import dataaccess.*;
+
 
 public class PreloginUI {
     private ServerFacade serverFacade;
-    private ClearService clearService;
     private Scanner scanner;
 
     public PreloginUI(ServerFacade serverFacade, Scanner scanner) {
         this.serverFacade = serverFacade;
         this.scanner = scanner;
 
-        // Initialize ClearService
-        IUserDataDAO userDataDAO = new MySqlUserDataDAO();
-        IGameDataDAO gameDataDAO = new MySqlGameDataDAO();
-        IAuthDataDAO authDataDAO = new MySqlAuthDataDAO();
-        this.clearService = new ClearService(userDataDAO, gameDataDAO, authDataDAO);
     }
 
     public void show(){
@@ -37,9 +30,6 @@ public class PreloginUI {
                     break;
                 case "register":
                     register();
-                    break;
-                case "cleardb":  // Example command to clear the database
-                    clearDatabase();
                     break;
                 default:
                     System.out.println("Invalid command. Type 'help' to see the list of available commands.");
@@ -88,12 +78,4 @@ public class PreloginUI {
         }
     }
 
-    private void clearDatabase() {
-        try {
-            clearService.clear();
-            System.out.println("Database cleared.");
-        } catch (DataAccessException e) {
-            System.out.println("Failed to clear database: " + e.getMessage());
-        }
-    }
 }
