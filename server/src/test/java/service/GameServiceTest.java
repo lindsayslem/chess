@@ -39,8 +39,10 @@ public class GameServiceTest {
     @Test
     public void createGameFailure() {
         // Attempt to create a game with an invalid auth token
+        GameData gameData = new GameData(1, null, null, "gameName", new ChessGame());
+
         DataAccessException exception = assertThrows(DataAccessException.class, () -> {
-            gameService.createGame(new GameData(1, null, null, "gameName", new ChessGame()), "invalidToken");
+            gameService.createGame(gameData, "invalidToken");
         });
 
         assertEquals("Auth token not found.", exception.getMessage());
