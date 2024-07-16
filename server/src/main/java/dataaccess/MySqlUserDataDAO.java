@@ -45,30 +45,20 @@ public class MySqlUserDataDAO implements IUserDataDAO {
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        return getUserData(username);
-    }
-
-    static UserData getUserData(String username) throws DataAccessException {
-        UserData user = null;
-        String sql = "SELECT * FROM users WHERE username = ?";
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, username);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    user = new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, password, email FROM users WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readUser(rs);
+                    }
                 }
             }
-        } catch (SQLException e) {
-            throw new DataAccessException("Error occurred while getting user");
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
-
-        if (user == null) {
-            throw new DataAccessException("User not found.");
-        }
-        return user;
+        throw new DataAccessException("User not found.");
     }
 
     @Override
@@ -82,6 +72,12 @@ public class MySqlUserDataDAO implements IUserDataDAO {
         } catch (DataAccessException e) {
             throw new DataAccessException(String.format("Unable to clear user data: %s", e.getMessage()));
         }
+    }
+    private UserData readUser(ResultSet rs) throws SQLException {
+        var username = rs.getString("username");
+        var password = rs.getString("password");
+        var email = rs.getString("email");
+        return new UserData(username, password, email);
     }
     
 }

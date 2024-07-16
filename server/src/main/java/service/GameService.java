@@ -17,21 +17,10 @@ public class GameService {
         this.authDataDAO = authDataDAO;
     }
 
-    public GameData createGame(String gameName, String authToken) throws DataAccessException {
-        if (gameName == null || gameName.trim().isEmpty()) {
-            throw new DataAccessException("Error: Game name cannot be null or empty");
-        }
-        //AuthData authData = authDataDAO.getAuth(authToken);
-        //if (authData == null) {
-          //  System.out.println("Error: unauthorized - Auth token is invalid");
-            //throw new DataAccessException("Error: unauthorized");
-        //}
-        //System.out.println("Auth token is valid. Creating game...");
+    public GameData createGame(GameData gameData, String authToken) throws DataAccessException {
+        AuthData authData = authDataDAO.getAuth(authToken);
 
-        // Create game
-        GameData createdGame = gameDataDAO.createGame(gameName);
-        System.out.println("Game created with ID: " + createdGame.getGameID());
-        return createdGame;
+        return gameDataDAO.createGame(gameData.getGameName());
     }
 
     public boolean joinGame(ChessGame.TeamColor playerColor, int gameID, String authToken) throws DataAccessException {

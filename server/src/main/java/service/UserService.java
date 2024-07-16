@@ -1,5 +1,4 @@
 package service;
-
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
@@ -10,6 +9,7 @@ import java.util.UUID;
 public class UserService {
     private final IUserDataDAO userDataDAO;
     private final IAuthDataDAO authDataDAO;
+
 
     public UserService(IUserDataDAO userDataDAO, IAuthDataDAO authDataDAO) {
         this.userDataDAO = userDataDAO;
@@ -30,12 +30,10 @@ public class UserService {
 
         // Register user
         userDataDAO.createUser(user);
-
         // Create auth token
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, user.username());
         authDataDAO.createAuth(authData);
-
         return authData;
     }
 
@@ -50,7 +48,6 @@ public class UserService {
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, user.username());
         authDataDAO.createAuth(authData);
-
         return authData;
     }
 

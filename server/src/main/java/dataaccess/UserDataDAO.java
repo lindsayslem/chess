@@ -5,7 +5,6 @@ import model.UserData;
 import java.util.HashMap;
 import java.util.Map;
 
-import static dataaccess.MySqlUserDataDAO.getUserData;
 
 public class UserDataDAO implements IUserDataDAO {
     private final Map<String, UserData> userDataMap = new HashMap<>();
@@ -21,7 +20,12 @@ public class UserDataDAO implements IUserDataDAO {
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        return getUserData(username);
+        try{
+            return getUser(username);
+        }
+        catch (Exception e){
+            return null;
+        }
     }
 
     @Override
