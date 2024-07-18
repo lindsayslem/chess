@@ -21,7 +21,8 @@ public class KnightMovesCalculator {
         return kingAndKnightMovements(position, legalMoves, moves, board, pieceColor);
     }
 
-    static Collection<ChessMove> kingAndKnightMovements(ChessPosition position, List<ChessMove> legalMoves, int[][] moves, ChessBoard board, ChessGame.TeamColor pieceColor) {
+    static Collection<ChessMove> kingAndKnightMovements(ChessPosition position, List<ChessMove> legalMoves, int[][]
+            moves, ChessBoard board, ChessGame.TeamColor pieceColor) {
         for (int[] move : moves) {
             int rowDirection = move[0];
             int colDirection = move[1];
