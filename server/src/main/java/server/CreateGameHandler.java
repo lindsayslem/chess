@@ -2,6 +2,7 @@ package server;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import model.ErrorResponse;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -27,7 +28,7 @@ public class CreateGameHandler implements Route {
             return gson.toJson(createdGame);
         } catch (DataAccessException e) {
             response.status(401);
-            return gson.toJson(new Error("Error: unauthorized"));
+            return gson.toJson(new ErrorResponse("Error: unauthorized"));
         } catch (Exception e) {
             response.status(500);
             return gson.toJson(new GameData(0, null, null, "Error: internal server error", null));

@@ -7,7 +7,7 @@ import service.UserService;
 import model.AuthData;
 import model.UserData;
 import dataaccess.DataAccessException;
-import model.Error;
+import model.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,11 +31,11 @@ public class LoginHandler implements Route {
         } catch (DataAccessException e) {
             logger.error("Login failed: {}", e.getMessage());
             response.status(401);
-            return gson.toJson(new Error("Error: unauthorized"));
+            return gson.toJson(new ErrorResponse("Error: unauthorized"));
         } catch (Exception e) {
             logger.error("Internal server error during login: ", e);
             response.status(500);
-            return gson.toJson(new Error("Error: internal server error"));
+            return gson.toJson(new ErrorResponse("Error: internal server error"));
         }
     }
 }

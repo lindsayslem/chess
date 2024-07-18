@@ -6,7 +6,7 @@ import spark.Route;
 import service.UserService;
 import dataaccess.DataAccessException;
 import com.google.gson.Gson;
-import model.Error;
+import model.ErrorResponse;
 
 public class LogoutHandler implements Route {
     private final UserService userService;
@@ -26,10 +26,10 @@ public class LogoutHandler implements Route {
         }
         catch (DataAccessException e){
             response.status(401);
-            return gson.toJson(new Error("Error: unauthorized"));
+            return gson.toJson(new ErrorResponse("Error: unauthorized"));
         }
         catch (Exception e) {
             response.status(500);
-            return gson.toJson(new Error("Error: internal server error"));        }
+            return gson.toJson(new ErrorResponse("Error: internal server error"));        }
     }
 }
