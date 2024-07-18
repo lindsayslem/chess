@@ -111,20 +111,7 @@ public class ChessGame {
         if(kingPosition == null){
             return false;
         }
-        for(int row = 0; row < 8; row++){
-            for(int col = 0; col < 8; col++){
-                ChessPiece piece = board.getPiece(new ChessPosition(row +1, col+1));
-                if(piece != null && piece.getTeamColor() != teamColor){
-                    Collection<ChessMove> validMoves = piece.pieceMoves(board, new ChessPosition(row+1, col+1));
-                    for(ChessMove move : validMoves){
-                        if(move.getEndPosition().equals(kingPosition)){
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+        return isKingInCheck(kingPosition, teamColor);
     }
 
     /**
@@ -186,6 +173,24 @@ public class ChessGame {
         }
         return null;
     }
+
+    private boolean isKingInCheck(ChessPosition kingPosition, TeamColor teamColor) {
+        for(int row = 0; row < 8; row++){
+            for(int col = 0; col < 8; col++){
+                ChessPiece piece = board.getPiece(new ChessPosition(row +1, col+1));
+                if(piece != null && piece.getTeamColor() != teamColor){
+                    Collection<ChessMove> validMoves = piece.pieceMoves(board, new ChessPosition(row+1, col+1));
+                    for(ChessMove move : validMoves){
+                        if(move.getEndPosition().equals(kingPosition)){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 
     public ChessBoard copyBoard(ChessBoard board, ChessMove move){
         ChessBoard newBoard = new ChessBoard();
