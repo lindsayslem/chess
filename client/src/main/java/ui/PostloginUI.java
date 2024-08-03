@@ -84,7 +84,8 @@ public class PostloginUI {
             System.out.println("Available games:");
             for (Map.Entry<Integer, GameData> entry : gameList.entrySet()) {
                 GameData game = entry.getValue();
-                System.out.printf("%d. %s (White: %s, Black: %s)\n", entry.getKey(), game.getGameName(), game.getWhiteUsername(), game.getBlackUsername());
+                System.out.printf("%d. %s (White: %s, Black: %s)\n", entry.getKey(), game.getGameName(),
+                        game.getWhiteUsername(), game.getBlackUsername());
             }
         } else {
             System.out.println("Failed to list games.");

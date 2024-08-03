@@ -7,7 +7,7 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 import service.GameService;
-import model.Error;
+import model.ErrorResponse;
 import dataaccess.DataAccessException;
 import chess.ChessGame;
 
@@ -26,14 +26,14 @@ public class JoinGameHandler implements Route {
 
             if (authToken == null || authToken.isEmpty()) {
                 response.status(401);
-                return gson.toJson(new Error("Error: unauthorized"));
+                return gson.toJson(new ErrorResponse("Error: unauthorized"));
             }
 
             JsonObject jsonObject = JsonParser.parseString(request.body()).getAsJsonObject();
 
             if (!jsonObject.has("playerColor") || !jsonObject.has("gameID")) {
                 response.status(400);
-                return gson.toJson(new Error("Error: bad request"));
+                return gson.toJson(new ErrorResponse("Error: bad request"));
             }
 
             String playerColorStr = jsonObject.get("playerColor").getAsString();
@@ -42,7 +42,7 @@ public class JoinGameHandler implements Route {
                 playerColor = ChessGame.TeamColor.valueOf(playerColorStr);
             } catch (IllegalArgumentException e) {
                 response.status(400);
-                return gson.toJson(new Error("Error: bad request"));
+                return gson.toJson(new ErrorResponse("Error: bad request"));
             }
 
             int gameID = jsonObject.get("gameID").getAsInt();
@@ -54,15 +54,15 @@ public class JoinGameHandler implements Route {
                 return "{}";
             } else {
                 response.status(403);
-                return gson.toJson(new Error("Error: already taken"));
+                return gson.toJson(new ErrorResponse("Error: already taken"));
             }
 
         } catch (DataAccessException e) {
             response.status(401);
-            return gson.toJson(new Error("Error: unauthorized"));
+            return gson.toJson(new ErrorResponse("Error: unauthorized"));
         } catch (Exception e) {
             response.status(500);
-            return gson.toJson(new Error("Error: internal server error"));
+            return gson.toJson(new ErrorResponse("Error: internal server error"));
         }
     }
 }

@@ -9,7 +9,7 @@ import service.UserService;
 import model.UserData;
 import model.AuthData;
 import dataaccess.DataAccessException;
-import model.Error;
+import model.ErrorResponse;
 
 
 public class RegisterHandler implements Route {
@@ -26,7 +26,7 @@ public class RegisterHandler implements Route {
             UserData userData = gson.fromJson(request.body(), UserData.class);
             if(userData.username() == null || userData.password() == null || userData.email() == null){
                 response.status(400);
-                return gson.toJson(new Error("Error: bad request"));
+                return gson.toJson(new ErrorResponse("Error: bad request"));
             }
             AuthData authData = userService.register(userData);
             response.status(200);
@@ -34,10 +34,10 @@ public class RegisterHandler implements Route {
         }
         catch(DataAccessException e){
             response.status(403);
-            return gson.toJson(new Error("Error: already taken"));
+            return gson.toJson(new ErrorResponse("Error: already taken"));
         } catch(Exception e) {
             response.status(500);
-            return gson.toJson(new Error("Error: bad request"));
+            return gson.toJson(new ErrorResponse("Error: bad request"));
         }
     }
 }

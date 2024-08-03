@@ -34,7 +34,7 @@ public class Server {
         }
 
         Spark.port(desiredPort);
-        Spark.staticFiles.location("web");
+        Spark.staticFiles.location("/web");
 
         Spark.post("/user", new RegisterHandler(userService));
         Spark.delete("/db", new ClearHandler(clearService));

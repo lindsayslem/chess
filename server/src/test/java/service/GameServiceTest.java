@@ -25,7 +25,6 @@ public class GameServiceTest {
 
     @Test
     public void createGameSuccess() throws DataAccessException {
-        // Add valid auth data
         AuthData authData = new AuthData("authToken1", "user1");
         authDataDAO.createAuth(authData);
 
@@ -38,11 +37,8 @@ public class GameServiceTest {
 
     @Test
     public void createGameFailure() {
-        // Attempt to create a game with an invalid auth token
-        GameData gameData = new GameData(1, null, null, "gameName", new ChessGame());
-
         DataAccessException exception = assertThrows(DataAccessException.class, () -> {
-            gameService.createGame(gameData, "invalidToken");
+            gameService.createGame(new GameData(1, null, null, "gameName", new ChessGame()), "invalidToken");
         });
 
         assertEquals("Auth token not found.", exception.getMessage());

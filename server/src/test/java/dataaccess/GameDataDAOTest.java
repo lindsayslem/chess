@@ -135,7 +135,8 @@ public class GameDataDAOTest {
     @DisplayName("Update Non-Existent Game")
     public void updateGameNegative() {
         GameData nonExistentGame = new GameData(2, "whitePlayer", "blackPlayer", "nonExistentGame", new ChessGame());
-        DataAccessException exception = assertThrows(DataAccessException.class, () -> gameDao.updateGame(nonExistentGame), "Expected a DataAccessException to be thrown.");
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> gameDao.updateGame(nonExistentGame), "Expected a " +
+                "DataAccessException to be thrown.");
         assertEquals("Game not found.", exception.getMessage(), "The exception message should indicate that the game was not found.");
     }
 
