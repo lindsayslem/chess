@@ -5,6 +5,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class ServerFacade {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                return response.body();  // Assuming the response body contains the auth token
+                return gson.fromJson(response.body(), JsonObject.class).get("authToken").getAsString();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,7 +84,10 @@ public class ServerFacade {
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
+            System.out.println("Sending request to create game: " + requestBody + " with authToken: " + authToken);
+
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("Response: " + response.body());
         } catch (Exception e) {
             e.printStackTrace();
         }

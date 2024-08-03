@@ -19,6 +19,7 @@ public class GameService {
 
     public GameData createGame(GameData gameData, String authToken) throws DataAccessException {
         AuthData authData = authDataDAO.getAuth(authToken);
+        System.out.println("Auth Data: " + authData);
         if (authData == null) {
             System.out.println("Error: unauthorized - Auth token is invalid");
             throw new DataAccessException("Error: unauthorized");
@@ -27,7 +28,7 @@ public class GameService {
 
         // Create game
         GameData createdGame = gameDataDAO.createGame(gameData.getGameName());
-        System.out.println("Game created with ID: " + createdGame.getGameID());
+        System.out.println("Created Game: " + createdGame);
         return createdGame;
     }
 
@@ -69,6 +70,7 @@ public class GameService {
             throw new DataAccessException("Error: unauthorized");
         }
         Map<Integer, GameData> gamesMap = gameDataDAO.listGames();
+        System.out.println("List of Games: " + gamesMap);
         if(gamesMap == null){
             return Collections.emptyMap();
         }

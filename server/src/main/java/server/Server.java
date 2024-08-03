@@ -1,8 +1,6 @@
 package server;
 
-import dataaccess.MySqlAuthDataDAO;
-import dataaccess.MySqlGameDataDAO;
-import dataaccess.MySqlUserDataDAO;
+import dataaccess.*;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -15,6 +13,11 @@ public class Server {
     ClearService clearService;
 
     public Server() {
+        try{
+            DatabaseSetup.configureDatabase();
+        } catch(DataAccessException e){
+            e.printStackTrace();
+        }
         MySqlUserDataDAO userDataDAO = new MySqlUserDataDAO();
         MySqlGameDataDAO gameDataDAO = new MySqlGameDataDAO();
         MySqlAuthDataDAO authDataDAO = new MySqlAuthDataDAO();

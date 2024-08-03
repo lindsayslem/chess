@@ -68,14 +68,17 @@ public class ServerFacadeTests {
     @Test
     public void createGamePositive() throws Exception {
         String authToken = facade.register("player1", "password", "p1@email.com");
+        System.out.println("Auth Token after registration: " + authToken);
         assertNotNull(authToken);
 
         facade.createGame(authToken, "NewGame");
         Map<Integer, GameData> games = facade.listGames(authToken);
+        System.out.println("List of Games: " + games);
         assertNotNull(games);
         assertEquals(1, games.size());
         assertEquals("NewGame", games.values().iterator().next().getGameName());
     }
+
 
     @Test
     void createGameNegative() throws Exception {

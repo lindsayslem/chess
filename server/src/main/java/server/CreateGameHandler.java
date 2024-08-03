@@ -21,7 +21,9 @@ public class CreateGameHandler implements Route {
     public Object handle(Request request, Response response) {
         try {
             String authToken = request.headers("Authorization").replace("Bearer ", "");
+            System.out.println("Auth Token in request: " + authToken);
             GameData gameData = gson.fromJson(request.body(), GameData.class);
+            System.out.println("Auth Token in request: " + authToken);
             GameData createdGame = gameService.createGame(gameData, authToken);
             response.status(200);
             return gson.toJson(createdGame);
