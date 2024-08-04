@@ -17,6 +17,11 @@ public class UserService {
     }
 
     public AuthData register(UserData user) throws DataAccessException {
+        if (user.username() == null || user.username().isEmpty() ||
+                user.password() == null || user.password().isEmpty() ||
+                user.email() == null || user.email().isEmpty()) {
+            throw new DataAccessException("Invalid input");
+        }
         // Check if user already exists
         try {
             userDataDAO.getUser(user.username());

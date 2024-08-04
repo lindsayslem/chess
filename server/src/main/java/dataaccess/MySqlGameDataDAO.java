@@ -29,20 +29,16 @@ public class MySqlGameDataDAO implements IGameDataDAO {
         try (Connection conn = DatabaseManager.getConnection()) {
             // Disable auto-commit mode
             conn.setAutoCommit(false);
-            System.out.println("Auto-commit disabled.");
 
             // Check if the game already exists
             try (PreparedStatement checkStmt = conn.prepareStatement(check)) {
                 checkStmt.setString(1, gameName);
                 try (ResultSet rs = checkStmt.executeQuery()) {
                     if (rs.next() && rs.getInt(1) > 0) {
-                        System.out.println("Game with the same name already exists.");
                         throw new DataAccessException("Game with the same name already exists.");
                     }
                 }
             }
-            System.out.println("Game does not exist, proceeding to insert.");
-
             // Insert the new game
             try (PreparedStatement stmt = conn.prepareStatement(statement, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 stmt.setString(1, gameName);
@@ -50,11 +46,9 @@ public class MySqlGameDataDAO implements IGameDataDAO {
                 stmt.setNull(3, Types.VARCHAR); // blackUsername
                 stmt.setString(4, "{}"); // Assuming game data as an empty JSON object
                 int rowsInserted = stmt.executeUpdate(); // This is where the row is supposed to be inserted
-                System.out.println("Rows inserted: " + rowsInserted); // Debug statement
 
                 if (rowsInserted == 0) {
                     conn.rollback();
-                    System.out.println("Creating game failed, no rows affected. Rolling back.");
                     throw new DataAccessException("Creating game failed, no rows affected.");
                 }
 
@@ -62,11 +56,9 @@ public class MySqlGameDataDAO implements IGameDataDAO {
                     if (generatedKeys.next()) {
                         int gameID = generatedKeys.getInt(1);
                         conn.commit();
-                        System.out.println("Created game with ID: " + gameID); // Debug statement
                         return new GameData(gameID, null, null, gameName, new ChessGame());
                     } else {
                         conn.rollback();
-                        System.out.println("Creating game failed, no ID obtained. Rolling back.");
                         throw new DataAccessException("Creating game failed, no ID obtained.");
                     }
                 }

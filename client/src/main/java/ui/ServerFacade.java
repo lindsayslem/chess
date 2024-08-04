@@ -12,6 +12,7 @@ import java.util.Map;
 
 import model.CreateGameRequest;
 import model.GameData;
+import model.JoinGameRequest;
 
 public class ServerFacade {
     private final String serverUrl;
@@ -86,10 +87,7 @@ public class ServerFacade {
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
-            System.out.println("CGSF Sending request to create game: " + requestBody + " with authToken: " + authToken);
-
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Response: " + response.body());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -105,7 +103,6 @@ public class ServerFacade {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                System.out.println("List of Games Response: " + response.body()); // Print response body
                 Type gameMapType = new TypeToken<Map<Integer, GameData>>() {}.getType();
                 return gson.fromJson(response.body(), gameMapType);
             }
@@ -122,10 +119,11 @@ public class ServerFacade {
                     .uri(new URI(serverUrl + "/game"))
                     .header("Authorization", "Bearer " + authToken)
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                    .PUT(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
-
-            client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("Sending Join Game request: " + requestBody);
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("Join Game Response: " + response.body());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -167,16 +165,6 @@ public class ServerFacade {
         LoginRequest(String username, String password) {
             this.username = username;
             this.password = password;
-        }
-    }
-
-    private static class JoinGameRequest {
-        int gameId;
-        String color;
-
-        JoinGameRequest(int gameId, String color) {
-            this.gameId = gameId;
-            this.color = color;
         }
     }
 

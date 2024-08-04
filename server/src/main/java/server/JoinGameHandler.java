@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import model.JoinGameRequest;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -22,32 +23,32 @@ public class JoinGameHandler implements Route {
     @Override
     public Object handle(Request request, Response response) {
         try {
-            String authToken = request.headers("authorization");
-
+            String authToken = request.headers("Authorization").replace("Bearer ", "").trim();
+            System.out.println("JGH authToken: " + authToken);
             if (authToken == null || authToken.isEmpty()) {
                 response.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));
             }
 
-            JsonObject jsonObject = JsonParser.parseString(request.body()).getAsJsonObject();
+            JoinGameRequest joinGameRequest = gson.fromJson(request.body(), JoinGameRequest.class);
+            System.out.println("JoinGame request body: " + gson.toJson(joinGameRequest));
 
-            if (!jsonObject.has("playerColor") || !jsonObject.has("gameID")) {
+            if (joinGameRequest.getColor() == null || joinGameRequest.getGameId() == 0) {
                 response.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
 
-            String playerColorStr = jsonObject.get("playerColor").getAsString();
             ChessGame.TeamColor playerColor;
             try {
-                playerColor = ChessGame.TeamColor.valueOf(playerColorStr);
+                playerColor = ChessGame.TeamColor.valueOf(joinGameRequest.getColor());
             } catch (IllegalArgumentException e) {
                 response.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
 
-            int gameID = jsonObject.get("gameID").getAsInt();
+            int gameId = joinGameRequest.getGameId();
 
-            boolean joinSuccessful = gameService.joinGame(playerColor, gameID, authToken);
+            boolean joinSuccessful = gameService.joinGame(playerColor, gameId, authToken);
 
             if (joinSuccessful) {
                 response.status(200);

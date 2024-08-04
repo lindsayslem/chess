@@ -46,7 +46,6 @@ public class ServerFacadeTests {
 
     @Test
     void registerNegative() throws Exception {
-        // Attempt to register with missing fields
         String authToken = facade.register("player1", "", "p1@email.com");
         assertNull(authToken);
     }

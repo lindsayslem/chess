@@ -21,15 +21,13 @@ public class CreateGameHandler implements Route {
     public Object handle(Request request, Response response) {
         try {
             String authToken = request.headers("Authorization").replace("Bearer ", "");
-            System.out.println("CGH authToken: " + authToken);
             GameData gameData = gson.fromJson(request.body(), GameData.class);
-            System.out.println("Received game data: " + gameData);
             GameData createdGame = gameService.createGame(gameData, authToken);
             response.status(200);
             return gson.toJson(createdGame);
         } catch (DataAccessException e) {
             response.status(401);
-            return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            return gson.toJson(new ErrorResponse("CGH Error: unauthorized"));
         } catch (Exception e) {
             response.status(500);
             return gson.toJson(new ErrorResponse("Error: internal server error"));

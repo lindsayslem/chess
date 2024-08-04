@@ -28,7 +28,7 @@ public class ListGamesHandler implements Route {
             return gson.toJson(games);
         }  catch (DataAccessException e) {
             response.status(401);
-            return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            return gson.toJson(new ErrorResponse("LGH Error: unauthorized"));
         } catch (Exception e) {
             response.status(500);
             return gson.toJson(new ErrorResponse("Error: internal server error"));

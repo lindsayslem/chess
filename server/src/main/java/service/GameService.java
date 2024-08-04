@@ -18,21 +18,14 @@ public class GameService {
     }
 
     public GameData createGame(GameData gameData, String authToken) throws DataAccessException {
-        System.out.println("Starting game creation with authToken: " + authToken);
         AuthData authData = authDataDAO.getAuth(authToken);
-        System.out.println("Auth Data: " + authData);
         if (authData == null) {
-            System.out.println("Error: unauthorized - Auth token is null");
             throw new DataAccessException("Error: unauthorized");
         }
-        System.out.println("Auth token is valid. Creating game...");
-        System.out.println("Received game data: " + gameData);
         try {
             // Insert game data into the database
             gameDataDAO.createGame(gameData.getGameName());
-            System.out.println("Game created successfully.");
         } catch (Exception e) {
-            System.out.println("Exception while creating game: " + e.getMessage());
             throw new DataAccessException("Error creating game: " + e.getMessage());
         }
 
@@ -41,6 +34,7 @@ public class GameService {
 
 
     public boolean joinGame(ChessGame.TeamColor playerColor, int gameID, String authToken) throws DataAccessException {
+        authToken = authToken.replace("Bearer ", "");
         AuthData authData = authDataDAO.getAuth(authToken);
 
         if (authData == null) {
@@ -66,6 +60,11 @@ public class GameService {
         } else {
             throw new DataAccessException("Bad request");
         }
+        // Print statements for debugging
+        System.out.println("Joining game: " + gameID);
+        System.out.println("Username: " + username);
+        System.out.println("Player color: " + playerColor);
+        System.out.println("Game data before update: " + gameData);
 
         gameDataDAO.updateGame(gameData);
         return true;
@@ -78,7 +77,6 @@ public class GameService {
             throw new DataAccessException("Error: unauthorized");
         }
         Map<Integer, GameData> gamesMap = gameDataDAO.listGames();
-        System.out.println("List of Games: " + gamesMap);
         if(gamesMap == null){
             return Collections.emptyMap();
         }
