@@ -79,12 +79,12 @@ public class ServerFacade {
             String requestBody = gson.toJson(new CreateGameRequest(gameName));
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(serverUrl + "/game"))
-                    .header("Authorization", "Bearer " + authToken)
+                    .header("Authorization", "Bearer " + authToken.trim())
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
-            System.out.println("Sending request to create game: " + requestBody + " with authToken: " + authToken);
+            System.out.println("CGSF Sending request to create game: " + requestBody + " with authToken: " + authToken);
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             System.out.println("Response: " + response.body());

@@ -18,18 +18,25 @@ public class GameService {
     }
 
     public GameData createGame(GameData gameData, String authToken) throws DataAccessException {
+        System.out.println("Starting game creation with authToken: " + authToken);
         AuthData authData = authDataDAO.getAuth(authToken);
         System.out.println("Auth Data: " + authData);
         if (authData == null) {
-            System.out.println("Error: unauthorized - Auth token is invalid");
+            System.out.println("Error: unauthorized - Auth token is null");
             throw new DataAccessException("Error: unauthorized");
         }
         System.out.println("Auth token is valid. Creating game...");
+        System.out.println("Received game data: " + gameData);
+        try {
+            // Insert game data into the database
+            gameDataDAO.createGame(gameData.getGameName());
+            System.out.println("Game created successfully.");
+        } catch (Exception e) {
+            System.out.println("Exception while creating game: " + e.getMessage());
+            throw new DataAccessException("Error creating game: " + e.getMessage());
+        }
 
-        // Create game
-        GameData createdGame = gameDataDAO.createGame(gameData.getGameName());
-        System.out.println("Created Game: " + createdGame);
-        return createdGame;
+        return gameData;
     }
 
 

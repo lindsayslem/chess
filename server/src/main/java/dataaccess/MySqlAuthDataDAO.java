@@ -18,6 +18,9 @@ public class MySqlAuthDataDAO implements IAuthDataDAO {
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
+        if (authToken.startsWith("Bearer ")) {
+            authToken = authToken.substring(7);
+        }
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT authToken, username FROM auth WHERE authToken=?";
             try (var ps = conn.prepareStatement(statement)) {
@@ -25,16 +28,23 @@ public class MySqlAuthDataDAO implements IAuthDataDAO {
                 ps.setString(1, authToken);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        System.out.println("AuthData found: " + rs.getString("authToken") + ", " + rs.getString("username"));
-                        return new AuthData(rs.getString("authToken"), rs.getString("username"));
-                    }
-                    else {
+                        try {
+                            String retrievedAuthToken = rs.getString("authToken");
+                            String retrievedUsername = rs.getString("username");
+                            System.out.println("AuthData found: " + retrievedAuthToken + ", " + retrievedUsername);
+                            return new AuthData(retrievedAuthToken, retrievedUsername);
+                        } catch (Exception e) {
+                            System.out.println("Exception while processing result set: " + e.getMessage());
+                            throw new DataAccessException(format("Unable to process data: %s", e.getMessage()));
+                        }
+                    } else {
                         System.out.println("AuthData not found for token: " + authToken);
                         return null;
                     }
                 }
             }
         } catch (Exception e) {
+            System.out.println("Exception in getAuth: " + e.getMessage());
             throw new DataAccessException(format("Unable to read data: %s", e.getMessage()));
         }
     }

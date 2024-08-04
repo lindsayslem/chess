@@ -21,9 +21,6 @@ public class DatabaseSetup {
                     ps.setInt(i + 1, (Integer) param);
                 }
             }
-            // Log the SQL statement and parameters
-            System.out.println("Executing SQL: " + statement);
-            System.out.println("With parameters: " + Arrays.toString(params));
 
             ps.executeUpdate();
 
