@@ -72,11 +72,11 @@ public class ServerFacadeTests {
         assertNotNull(authToken);
 
         facade.createGame(authToken, "NewGame");
-        /*Map<Integer, GameData> games = facade.listGames(authToken);
+        Map<Integer, GameData> games = facade.listGames(authToken);
         System.out.println("List of Games: " + games);
         assertNotNull(games);
         assertEquals(1, games.size());
-        assertEquals("NewGame", games.values().iterator().next().getGameName());*/
+        assertEquals("NewGame", games.values().iterator().next().getGameName());
     }
 
 

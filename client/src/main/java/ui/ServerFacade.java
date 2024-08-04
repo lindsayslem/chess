@@ -9,6 +9,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.Map;
+
+import model.CreateGameRequest;
 import model.GameData;
 
 public class ServerFacade {
@@ -164,14 +166,6 @@ public class ServerFacade {
         LoginRequest(String username, String password) {
             this.username = username;
             this.password = password;
-        }
-    }
-
-    private static class CreateGameRequest {
-        String name;
-
-        CreateGameRequest(String name) {
-            this.name = name;
         }
     }
 
