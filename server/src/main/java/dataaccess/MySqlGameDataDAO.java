@@ -24,7 +24,6 @@ public class MySqlGameDataDAO implements IGameDataDAO {
         if (gameName == null || gameName.trim().isEmpty()) {
             throw new DataAccessException("Game name cannot be null or empty.");
         }
-
         var statement = "INSERT INTO games (gameName, whiteUsername, blackUsername, game) VALUES (?, ?, ?, ?)";
         var check = "SELECT COUNT(*) FROM games WHERE gameName = ?";
         try (Connection conn = DatabaseManager.getConnection()) {

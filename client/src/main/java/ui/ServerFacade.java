@@ -105,6 +105,7 @@ public class ServerFacade {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
+                System.out.println("List of Games Response: " + response.body()); // Print response body
                 Type gameMapType = new TypeToken<Map<Integer, GameData>>() {}.getType();
                 return gson.fromJson(response.body(), gameMapType);
             }

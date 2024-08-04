@@ -17,7 +17,7 @@ public class ListGamesHandler implements Route {
     @Override
     public Object handle(Request request, Response response) {
         try {
-            String authToken = request.headers("authorization");
+            String authToken = request.headers("Authorization").replace("Bearer ", "");
             // Check if the auth token is present and valid
             if (authToken == null || authToken.isEmpty()) {
                 response.status(401);
@@ -25,7 +25,7 @@ public class ListGamesHandler implements Route {
             }
             Map<Integer, GameData> games = gameService.listGames(authToken);
             response.status(200);
-            return gson.toJson(Map.of("games", games.values()));
+            return gson.toJson(games);
         }  catch (DataAccessException e) {
             response.status(401);
             return gson.toJson(new ErrorResponse("Error: unauthorized"));

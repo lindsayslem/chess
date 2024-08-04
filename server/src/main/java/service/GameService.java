@@ -72,6 +72,7 @@ public class GameService {
     }
 
     public Map<Integer, GameData> listGames(String authToken) throws DataAccessException {
+        authToken = authToken.replace("Bearer ", "");
         AuthData authData = authDataDAO.getAuth(authToken);
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized");
