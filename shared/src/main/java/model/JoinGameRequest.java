@@ -1,8 +1,8 @@
 package model;
 
 public class JoinGameRequest {
-    private int gameId;
-    private String color;
+    private final int gameId;
+    private final String color;
 
     public JoinGameRequest(int gameId, String color) {
         this.gameId = gameId;
@@ -13,15 +13,7 @@ public class JoinGameRequest {
         return gameId;
     }
 
-    public void setGameId(int gameId) {
-        this.gameId = gameId;
-    }
-
     public String getColor() {
         return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
     }
 }

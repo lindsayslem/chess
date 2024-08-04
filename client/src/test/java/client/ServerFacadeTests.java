@@ -21,7 +21,6 @@ public class ServerFacadeTests {
     public static void init() {
         server = new Server();
         var port = server.run(0);
-        System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade("http://localhost:" + port);
         clearService = new ClearService(new MySqlUserDataDAO(), new MySqlGameDataDAO(), new MySqlAuthDataDAO());
     }
@@ -38,20 +37,20 @@ public class ServerFacadeTests {
 
 
     @Test
-    void registerPositive() throws Exception {
+    void registerPositive() {
         String authToken = facade.register("player1", "password", "p1@email.com");
         assertNotNull(authToken);
         assertTrue(authToken.length() > 10);
     }
 
     @Test
-    void registerNegative() throws Exception {
+    void registerNegative(){
         String authToken = facade.register("player1", "", "p1@email.com");
         assertNull(authToken);
     }
 
     @Test
-    void loginPositive() throws Exception {
+    void loginPositive() {
         facade.register("player1", "password", "p1@email.com");
         String authToken = facade.login("player1", "password");
         assertNotNull(authToken);
@@ -59,13 +58,13 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void loginNegative() throws Exception {
+    void loginNegative() {
         String authToken = facade.login("nonexistent", "wrongpassword");
         assertNull(authToken);
     }
 
     @Test
-    public void createGamePositive() throws Exception {
+    public void createGamePositive() {
         String authToken = facade.register("player1", "password", "p1@email.com");
         System.out.println("Auth Token after registration: " + authToken);
         assertNotNull(authToken);
@@ -80,7 +79,7 @@ public class ServerFacadeTests {
 
 
     @Test
-    void createGameNegative() throws Exception {
+    void createGameNegative() {
         // Attempt to create a game without a valid auth token
         facade.createGame("invalidToken", "NewGame");
         Map<Integer, GameData> games = facade.listGames("invalidToken");
@@ -88,7 +87,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void listGamesPositive() throws Exception {
+    void listGamesPositive() {
         String authToken = facade.register("player1", "password", "p1@email.com");
         assertNotNull(authToken);
 
@@ -99,14 +98,14 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void listGamesNegative() throws Exception {
+    void listGamesNegative() {
         // Attempt to list games without a valid auth token
         Map<Integer, GameData> games = facade.listGames("invalidToken");
         assertNull(games);
     }
 
     @Test
-    void joinGamePositive() throws Exception {
+    void joinGamePositive() {
         String authToken = facade.register("player1", "password", "p1@email.com");
         assertNotNull(authToken);
 
@@ -120,7 +119,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void joinGameNegative() throws Exception {
+    void joinGameNegative() {
         // Attempt to join a game without a valid auth token
         facade.joinGame("invalidToken", 1, "WHITE");
         Map<Integer, GameData> games = facade.listGames("invalidToken");
@@ -128,7 +127,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void observeGamePositive() throws Exception {
+    void observeGamePositive() {
         String authToken = facade.register("player1", "password", "p1@email.com");
         assertNotNull(authToken);
 
@@ -141,7 +140,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void observeGameNegative() throws Exception {
+    void observeGameNegative() {
         // Attempt to observe a game without a valid auth token
         facade.observeGame("invalidToken", 1);
         Map<Integer, GameData> games = facade.listGames("invalidToken");

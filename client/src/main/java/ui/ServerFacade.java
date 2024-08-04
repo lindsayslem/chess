@@ -87,7 +87,7 @@ public class ServerFacade {
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -121,9 +121,7 @@ public class ServerFacade {
                     .header("Content-Type", "application/json")
                     .PUT(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
-            System.out.println("Sending Join Game request: " + requestBody);
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Join Game Response: " + response.body());
+            client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -142,19 +140,6 @@ public class ServerFacade {
             client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    // Helper classes for request bodies
-    private static class RegisterRequest {
-        String username;
-        String password;
-        String email;
-
-        RegisterRequest(String username, String password, String email) {
-            this.username = username;
-            this.password = password;
-            this.email = email;
         }
     }
 
