@@ -125,9 +125,9 @@ public class ServerFacade {
         return null;
     }
 
-    public void joinGame(String authToken, int gameId, String color) {
+    public void joinGame(String authToken, int gameID, String playerColor) {
         try {
-            String requestBody = gson.toJson(new JoinGameRequest(gameId, color));
+            String requestBody = gson.toJson(new JoinGameRequest(playerColor, gameID));
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(serverUrl + "/game"))
                     .header("Authorization", "Bearer " + authToken)

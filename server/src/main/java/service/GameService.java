@@ -24,7 +24,7 @@ public class GameService {
         }
         try {
             // Insert game data into the database
-            gameDataDAO.createGame(gameData.getGameName());
+            gameData = gameDataDAO.createGame(gameData.getGameName());
         } catch (Exception e) {
             throw new DataAccessException("Error creating game: " + e.getMessage());
         }
@@ -35,6 +35,7 @@ public class GameService {
 
     public boolean joinGame(ChessGame.TeamColor playerColor, int gameID, String authToken) throws DataAccessException {
         authToken = authToken.replace("Bearer ", "");
+        System.out.println("PLAYER COLOR: " );
         AuthData authData = authDataDAO.getAuth(authToken);
 
         if (authData == null) {

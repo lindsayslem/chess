@@ -55,6 +55,8 @@ public class DatabaseTests {
         TestCreateResult createResult = serverFacade.createGame(new TestCreateRequest(gameName), auth);
 
         //join the game
+        System.out.println("Created game " + gameName);
+        System.out.println("JOIN game " + createResult.getGameID());
         serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.WHITE, createResult.getGameID()), auth);
 
         Assertions.assertTrue(initialRowCount < getDatabaseRows(), "No new data added to database");

@@ -30,21 +30,24 @@ public class JoinGameHandler implements Route {
 
             JoinGameRequest joinGameRequest = gson.fromJson(request.body(), JoinGameRequest.class);
             System.out.println("JoinGame request body: " + gson.toJson(joinGameRequest));
+            String requestBody = request.body();
+            System.out.println("Raw Request Body: " + requestBody);
 
-            if (joinGameRequest.color() == null || joinGameRequest.gameId() == 0) {
+
+            if (joinGameRequest.getPlayerColor() == null || joinGameRequest.getGameID() == 0) {
                 response.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
 
             ChessGame.TeamColor playerColor;
             try {
-                playerColor = ChessGame.TeamColor.valueOf(joinGameRequest.color());
+                playerColor = ChessGame.TeamColor.valueOf(joinGameRequest.getPlayerColor());
             } catch (IllegalArgumentException e) {
                 response.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
 
-            int gameId = joinGameRequest.gameId();
+            int gameId = joinGameRequest.getGameID();
 
             boolean joinSuccessful = gameService.joinGame(playerColor, gameId, authToken);
 

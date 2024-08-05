@@ -55,6 +55,7 @@ public class MySqlGameDataDAO implements IGameDataDAO {
                     if (generatedKeys.next()) {
                         int gameID = generatedKeys.getInt(1);
                         conn.commit();
+                        System.out.println("Creating game: " + gameName + " with gameID: " + gameID);
                         return new GameData(gameID, null, null, gameName, new ChessGame());
                     } else {
                         conn.rollback();
@@ -81,7 +82,7 @@ public class MySqlGameDataDAO implements IGameDataDAO {
                         String blackUsername = rs.getString("blackUsername");
                         String gameDataJson = rs.getString("game");
                         ChessGame game = new Gson().fromJson(gameDataJson, ChessGame.class);
-                        System.out.println("Retrieved Game from DB: " + gameID + ", " + gameName);
+                        System.out.println("Retrieved Game from DB with ID: " + gameID + ", " + gameName);
                         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
                     } else {
                         throw new DataAccessException("Game not found with ID: " + gameID);
@@ -122,7 +123,7 @@ public class MySqlGameDataDAO implements IGameDataDAO {
                 try (var rs = ps.executeQuery()) {
                     while (rs.next()) {
                         var game = readGame(rs);
-                        System.out.println("Loaded game from DB: " + game.getGameName());
+                        System.out.println("Loaded game from DB: " + game.getGameID() + " with whiteUsername: " + game.getWhiteUsername());
                         result.put(game.getGameID(), game);
                     }
                 }
@@ -147,6 +148,7 @@ public class MySqlGameDataDAO implements IGameDataDAO {
         var gameName = rs.getString("gameName");
         var json = rs.getString("game");
         var game = new Gson().fromJson(json, ChessGame.class);
+        System.out.println("Reading game: " + gameID + " with whiteUsername: " + whiteUsername);
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
     }
 }
