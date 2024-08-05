@@ -81,7 +81,6 @@ public class GameplayUI {
                                    String number6, String number7, String number8) {
         for (int row = 0; row < 10; row++) {
             for (int col = 0; col < 10; col++) {
-                // Border handling with row numbers and column letters
                 if (row == 0 || row == 9) {
                     if (col == 0 || col == 9) {
                         System.out.print(borderColor + "   ");

@@ -27,7 +27,6 @@ public class MySqlGameDataDAO implements IGameDataDAO {
         var statement = "INSERT INTO games (gameName, whiteUsername, blackUsername, game) VALUES (?, ?, ?, ?)";
         var check = "SELECT COUNT(*) FROM games WHERE gameName = ?";
         try (Connection conn = DatabaseManager.getConnection()) {
-            // Disable auto-commit mode
             conn.setAutoCommit(false);
 
             // Check if the game already exists

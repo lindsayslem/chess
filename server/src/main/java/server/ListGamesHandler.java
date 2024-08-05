@@ -18,8 +18,7 @@ public class ListGamesHandler implements Route {
     public Object handle(Request request, Response response) {
         try {
             String authToken = request.headers("Authorization").replace("Bearer ", "");
-            // Check if the auth token is present and valid
-            if (authToken == null || authToken.isEmpty()) {
+            if (authToken.isEmpty()) {
                 response.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));
             }
