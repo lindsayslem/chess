@@ -52,10 +52,8 @@ public class GameplayUI {
     };
 
     public static void drawBoard() {
-        System.out.println("White at bottom:");
         drawBoardWhiteBottom();
-
-        System.out.println("Black at bottom:");
+        System.out.println("\n");
         drawBoardBlackBottom();
 
     }
