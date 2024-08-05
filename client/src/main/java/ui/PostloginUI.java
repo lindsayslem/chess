@@ -2,13 +2,13 @@ package ui;
 
 import java.util.Map;
 import java.util.Scanner;
-
 import model.GameData;
+import java.util.Arrays;
 
 public class PostloginUI {
     private final ServerFacade serverFacade;
     private final Scanner scanner;
-    private String authToken;
+    private final String authToken;
     private final String username;
     private Map<Integer, GameData> gameList;
 
@@ -21,40 +21,41 @@ public class PostloginUI {
 
     public void show() {
         System.out.println("Logged in as " + username);
-        while (true) {
+        var result = "";
+        while (!result.equals("quit")) {
             System.out.print("[LOGGED_IN] >>> ");
-            String command = scanner.nextLine().trim().toLowerCase();
-
-            switch (command) {
-                case "help":
-                    showHelp();
-                    break;
-                case "logout":
-                    logout();
-                    return;
-                case "create":
-                    createGame();
-                    break;
-                case "list":
-                    listGames();
-                    break;
-                case "join":
-                    joinGame();
-                    break;
-                case "observe":
-                    observeGame();
-                    break;
-                case "quit":
-                    System.exit(0);
-                case "play":
-                    playGame();
-                    break;
-                default:
-                    System.out.println("Invalid command. Type 'help' to see the list of available commands.");
-            }
+            String input = scanner.nextLine().trim().toLowerCase();
+            result = eval(input);
+            System.out.println(result);
         }
     }
 
+    public String eval(String input) {
+        try {
+            var tokens = input.split(" ");
+            var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
+                case "help" -> showHelp();
+                case "logout" -> {
+                    logout();
+                    yield "Logout successful.";
+                }
+                case "create" -> createGame(params);
+                case "list" -> listGames();
+                case "join" -> joinGame(params);
+                case "observe" -> observeGame(params);
+                case "play" -> playGame();
+                case "quit" -> {
+                    System.exit(0);
+                    yield "quit";
+                }
+                default -> "Invalid command. Type 'help' to see the list of available commands.";
+            };
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
+    }
 
     private String showHelp() {
         return """
@@ -71,63 +72,78 @@ public class PostloginUI {
 
     private void logout() {
         serverFacade.logout(authToken);
-        authToken = null;
-        State state = State.SIGNEDOUT;
-
         PreloginUI preloginUI = new PreloginUI(serverFacade, scanner);
-        String result = "";
+        var result = "";
         while (!result.equals("quit")) {
             System.out.print("[LOGGED_OUT] >>> ");
-            String line = scanner.nextLine();
-            result = preloginUI.eval(line);
-            System.out.print(result);
+            String input = scanner.nextLine().trim().toLowerCase();
+            result = preloginUI.eval(input);
+            System.out.println(result);
         }
     }
 
-    private void createGame() {
-        System.out.print("Enter game name: ");
-        String gameName = scanner.nextLine();
-        serverFacade.createGame(authToken, gameName);
+    private String createGame(String... params) {
+        if (params.length == 1) {
+            String gameName = params[0];
+            serverFacade.createGame(authToken, gameName);
+            return String.format("Game '%s' created successfully.", gameName);
+        }
+        return "Expected: create <NAME>";
     }
 
-    private void listGames() {
+    private String listGames() {
         gameList = serverFacade.listGames(authToken);
         if (gameList != null) {
-            System.out.println("Available games:");
+            var result = new StringBuilder();
+            result.append("Available games:\n");
             for (Map.Entry<Integer, GameData> entry : gameList.entrySet()) {
                 GameData game = entry.getValue();
-                System.out.printf("%d. %s (White: %s, Black: %s)\n", entry.getKey(), game.getGameName(),
-                        game.getWhiteUsername(), game.getBlackUsername());
+                result.append(String.format("%d. %s (White: %s, Black: %s)\n", entry.getKey(), game.getGameName(),
+                        game.getWhiteUsername(), game.getBlackUsername()));
             }
-        } else {
-            System.out.println("Failed to list games.");
+            return result.toString();
         }
+        return "Failed to list games.";
     }
 
-    private void joinGame() {
+    private String joinGame(String... params) {
         if (gameList == null) {
-            System.out.println("No games available. Use 'list' to see available games.");
-            return;
+            return "No games available. Use 'list' to see available games.";
         }
-        System.out.print("Enter game ID to join: ");
-        int gameId = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter color (WHITE/BLACK): ");
-        String color = scanner.nextLine().toUpperCase();
-        serverFacade.joinGame(authToken, gameId, color);
+        if (params.length == 2) {
+            int gameId;
+            try {
+                gameId = Integer.parseInt(params[0]);
+            } catch (NumberFormatException e) {
+                return "Expected: join <ID> [WHITE|BLACK]";
+            }
+            String color = params[1].toUpperCase();
+            serverFacade.joinGame(authToken, gameId, color);
+            return String.format("Joined game %d as %s", gameId, color);
+        }
+        return "Expected: join <ID> [WHITE|BLACK]";
     }
 
-    private void observeGame() {
+    private String observeGame(String... params) {
         if (gameList == null) {
-            System.out.println("No games available. Use 'list' to see available games.");
-            return;
+            return "No games available. Use 'list' to see available games.";
         }
-        System.out.print("Enter game ID to observe: ");
-        int gameId = Integer.parseInt(scanner.nextLine());
-        serverFacade.observeGame(authToken, gameId);
-        GameplayUI.drawBoard();
+        if (params.length == 1) {
+            int gameId;
+            try {
+                gameId = Integer.parseInt(params[0]);
+            } catch (NumberFormatException e) {
+                return "Expected: observe <ID>";
+            }
+            serverFacade.observeGame(authToken, gameId);
+            GameplayUI.drawBoard();
+            return String.format("Observing game %d", gameId);
+        }
+        return "Expected: observe <ID>";
     }
 
-    private void playGame() {
+    private String playGame() {
         GameplayUI.drawBoard();
+        return "Game started.";
     }
 }

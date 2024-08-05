@@ -37,10 +37,7 @@ public class ServerFacade {
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
-            System.out.println("Server URL: " + serverUrl + "/user");
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Status Line: " + response.statusCode());
-            System.out.println("Response Body: " + response.body());
             if (response.statusCode() == 200) {
                 return gson.fromJson(response.body(), JsonObject.class).get("authToken").getAsString();
             }
