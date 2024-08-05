@@ -2,13 +2,14 @@ package ui;
 
 import java.util.Map;
 import java.util.Scanner;
-import model.GameData;  // Import the GameData class
+
+import model.GameData;
 
 public class PostloginUI {
-    private ServerFacade serverFacade;
-    private Scanner scanner;
+    private final ServerFacade serverFacade;
+    private final Scanner scanner;
     private String authToken;
-    private String username;
+    private final String username;
     private Map<Integer, GameData> gameList;
 
     public PostloginUI(ServerFacade serverFacade, Scanner scanner, String authToken, String username) {
@@ -54,22 +55,33 @@ public class PostloginUI {
         }
     }
 
-    private void showHelp() {
-        System.out.println("create <NAME> - create a game");
-        System.out.println("list - list games");
-        System.out.println("join <ID> [WHITE|BLACK] - join a game");
-        System.out.println("observe <ID> - observe a game");
-        System.out.println("play - start playing the game");
-        System.out.println("logout - log out");
-        System.out.println("quit - exit the application");
-        System.out.println("help - display help");
+
+    private String showHelp() {
+        return """
+                - create <NAME> - create a game
+                - list - list games
+                - join <ID> [WHITE|BLACK] - join a game
+                - observe <ID> - observe a game
+                - play - start playing the game
+                - logout - log out
+                - quit - exit the application
+                - help - display help
+                """;
     }
 
     private void logout() {
         serverFacade.logout(authToken);
         authToken = null;
+        State state = State.SIGNEDOUT;
+
         PreloginUI preloginUI = new PreloginUI(serverFacade, scanner);
-        preloginUI.show();
+        String result = "";
+        while (!result.equals("quit")) {
+            System.out.print("[LOGGED_OUT] >>> ");
+            String line = scanner.nextLine();
+            result = preloginUI.eval(line);
+            System.out.print(result);
+        }
     }
 
     private void createGame() {

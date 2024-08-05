@@ -23,6 +23,7 @@ public class RegisterHandler implements Route {
     @Override
     public Object handle(Request request, Response response) {
         try {
+            System.out.println("Received registration request: " + request.body());
             UserData userData = gson.fromJson(request.body(), UserData.class);
             if(userData.username() == null || userData.password() == null || userData.email() == null){
                 response.status(400);
