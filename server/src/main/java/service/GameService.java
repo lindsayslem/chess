@@ -35,7 +35,6 @@ public class GameService {
 
     public boolean joinGame(ChessGame.TeamColor playerColor, int gameID, String authToken) throws DataAccessException {
         authToken = authToken.replace("Bearer ", "");
-        System.out.println("PLAYER COLOR: " );
         AuthData authData = authDataDAO.getAuth(authToken);
 
         if (authData == null) {
@@ -61,11 +60,6 @@ public class GameService {
         } else {
             throw new DataAccessException("Bad request");
         }
-        // Print statements for debugging
-        System.out.println("Joining game: " + gameID);
-        System.out.println("Username: " + username);
-        System.out.println("Player color: " + playerColor);
-        System.out.println("Game data before update: " + gameData);
 
         gameDataDAO.updateGame(gameData);
         return true;

@@ -27,7 +27,7 @@ public class CreateGameHandler implements Route {
             return gson.toJson(createdGame);
         } catch (DataAccessException e) {
             response.status(401);
-            return gson.toJson(new ErrorResponse("CGH Error: unauthorized"));
+            return gson.toJson(new ErrorResponse("Error: unauthorized"));
         } catch (Exception e) {
             response.status(500);
             return gson.toJson(new ErrorResponse("Error: internal server error"));

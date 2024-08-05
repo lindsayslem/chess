@@ -22,16 +22,13 @@ public class JoinGameHandler implements Route {
     public Object handle(Request request, Response response) {
         try {
             String authToken = request.headers("Authorization").replace("Bearer ", "").trim();
-            System.out.println("JGH authToken: " + authToken);
             if (authToken.isEmpty()) {
                 response.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));
             }
 
             JoinGameRequest joinGameRequest = gson.fromJson(request.body(), JoinGameRequest.class);
-            System.out.println("JoinGame request body: " + gson.toJson(joinGameRequest));
-            String requestBody = request.body();
-            System.out.println("Raw Request Body: " + requestBody);
+            request.body();
 
 
             if (joinGameRequest.getPlayerColor() == null || joinGameRequest.getGameID() == 0) {
