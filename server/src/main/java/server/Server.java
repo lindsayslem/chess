@@ -1,16 +1,20 @@
 package server;
 
 import dataaccess.*;
+import model.GameData;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
 import spark.Spark;
+
+import java.util.Map;
 
 public class Server {
     private boolean initialized = false;
     UserService userService;
     GameService gameService;
     ClearService clearService;
+    private MySqlGameDataDAO gameDataDAO;
 
     public Server() {
         try{
@@ -19,7 +23,7 @@ public class Server {
             e.printStackTrace();
         }
         MySqlUserDataDAO userDataDAO = new MySqlUserDataDAO();
-        MySqlGameDataDAO gameDataDAO = new MySqlGameDataDAO();
+        gameDataDAO = new MySqlGameDataDAO();
         MySqlAuthDataDAO authDataDAO = new MySqlAuthDataDAO();
 
         userService = new UserService(userDataDAO, authDataDAO);
@@ -45,6 +49,8 @@ public class Server {
         Spark.delete("/session", new LogoutHandler(userService));
 
 
+        loadGameData();
+
         Spark.awaitInitialization();
         initialized = true;
         return Spark.port();
@@ -55,6 +61,17 @@ public class Server {
             Spark.stop();
             Spark.awaitStop();
             initialized = false;
+        }
+    }
+
+    private void loadGameData() {
+        try {
+            Map<Integer, GameData> games = gameDataDAO.listGames();
+            for (GameData game : games.values()) {
+                System.out.println("Loaded game: " + game.getGameName());
+            }
+        } catch (DataAccessException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -5,9 +5,13 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import model.CreateGameRequest;
@@ -103,8 +107,17 @@ public class ServerFacade {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                Type gameMapType = new TypeToken<Map<Integer, GameData>>() {}.getType();
-                return gson.fromJson(response.body(), gameMapType);
+                JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
+                JsonArray gamesArray = jsonResponse.getAsJsonArray("games");
+                Type gameListType = new TypeToken<List<GameData>>() {}.getType();
+                List<GameData> gamesList = gson.fromJson(gamesArray, gameListType);
+
+                // Convert the List<GameData> to Map<Integer, GameData>
+                Map<Integer, GameData> gamesMap = new HashMap<>();
+                for (GameData gameData : gamesList) {
+                    gamesMap.put(gameData.getGameID(), gameData);
+                }
+                return gamesMap;
             }
         } catch (Exception e) {
             e.printStackTrace();

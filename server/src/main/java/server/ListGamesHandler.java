@@ -18,13 +18,15 @@ public class ListGamesHandler implements Route {
     public Object handle(Request request, Response response) {
         try {
             String authToken = request.headers("Authorization").replace("Bearer ", "");
+            System.out.println("Auth Token: " + authToken);
+
             if (authToken.isEmpty()) {
                 response.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));
             }
             Map<Integer, GameData> games = gameService.listGames(authToken);
             response.status(200);
-            return gson.toJson(games);
+            return gson.toJson(Map.of("games", games.values()));
         }  catch (DataAccessException e) {
             response.status(401);
             return gson.toJson(new ErrorResponse("LGH Error: unauthorized"));

@@ -81,6 +81,7 @@ public class MySqlGameDataDAO implements IGameDataDAO {
                         String blackUsername = rs.getString("blackUsername");
                         String gameDataJson = rs.getString("game");
                         ChessGame game = new Gson().fromJson(gameDataJson, ChessGame.class);
+                        System.out.println("Retrieved Game from DB: " + gameID + ", " + gameName);
                         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
                     } else {
                         throw new DataAccessException("Game not found with ID: " + gameID);
@@ -121,6 +122,7 @@ public class MySqlGameDataDAO implements IGameDataDAO {
                 try (var rs = ps.executeQuery()) {
                     while (rs.next()) {
                         var game = readGame(rs);
+                        System.out.println("Loaded game from DB: " + game.getGameName());
                         result.put(game.getGameID(), game);
                     }
                 }
@@ -128,6 +130,7 @@ public class MySqlGameDataDAO implements IGameDataDAO {
         } catch (Exception e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
+        System.out.println("Total games loaded: " + result.size());
         return result;
     }
 
