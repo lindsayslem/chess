@@ -58,7 +58,7 @@ public class ServerFacade {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                return response.body();
+                return gson.fromJson(response.body(), JsonObject.class).get("authToken").getAsString();
             }
         } catch (Exception e) {
             e.printStackTrace();
