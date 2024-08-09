@@ -5,8 +5,8 @@ public class GameplayUI {
             EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
             EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
             EscapeSequences.EMPTY, EscapeSequences.EMPTY,
-            EscapeSequences.WHITE_ROOK, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_BISHOP, EscapeSequences.WHITE_QUEEN,
-            EscapeSequences.WHITE_KING, EscapeSequences.WHITE_BISHOP, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_ROOK,
+            EscapeSequences.WHITE_ROOK, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_BISHOP, EscapeSequences.WHITE_KING, EscapeSequences.WHITE_QUEEN,
+            EscapeSequences.WHITE_BISHOP, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_ROOK,
             EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN,
             EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN,
             EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
@@ -19,8 +19,8 @@ public class GameplayUI {
             EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
             EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN,
             EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN,
-            EscapeSequences.BLACK_ROOK, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_BISHOP, EscapeSequences.BLACK_QUEEN,
-            EscapeSequences.BLACK_KING, EscapeSequences.BLACK_BISHOP, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_ROOK,
+            EscapeSequences.BLACK_ROOK, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_BISHOP,
+            EscapeSequences.BLACK_KING, EscapeSequences.BLACK_QUEEN, EscapeSequences.BLACK_BISHOP, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_ROOK,
             EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
             EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
             EscapeSequences.EMPTY, EscapeSequences.EMPTY
@@ -52,26 +52,26 @@ public class GameplayUI {
     };
 
     public static void drawBoard() {
-        drawBoardWhiteBottom();
+        drawBoardWhiteTop();
         System.out.println("\n");
-        drawBoardBlackBottom();
+        drawBoardBlackTop();
 
     }
 
-    private static void drawBoardWhiteBottom() {
+    private static void drawBoardWhiteTop() {
         String borderColor = EscapeSequences.SET_BG_COLOR_BLACK;
         String[] boardColors = { EscapeSequences.SET_BG_COLOR_LIGHT_GREY, EscapeSequences.SET_BG_COLOR_DARK_GREY };
         String columnLabels = " hgfedcba";
 
-        boardSetup(GameplayUI.PIECES_FLIPPED, borderColor, boardColors, columnLabels, "1", "2", "3", "4", "5", "6", "7", "8");
+        boardSetup(GameplayUI.PIECES, borderColor, boardColors, columnLabels, "1", "2", "3", "4", "5", "6", "7", "8");
 
     }
 
-    private static void drawBoardBlackBottom(){
+    private static void drawBoardBlackTop(){
         String borderColor = EscapeSequences.SET_BG_COLOR_BLACK;
         String[] boardColors = { EscapeSequences.SET_BG_COLOR_LIGHT_GREY, EscapeSequences.SET_BG_COLOR_DARK_GREY };
         String columnLabels = " abcdefgh";
-        boardSetup(GameplayUI.PIECES, borderColor, boardColors, columnLabels, "8", "7", "6", "5",
+        boardSetup(GameplayUI.PIECES_FLIPPED, borderColor, boardColors, columnLabels, "8", "7", "6", "5",
                 "4", "3", "2", "1");
 
     }
