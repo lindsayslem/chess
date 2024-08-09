@@ -118,6 +118,24 @@ public class PostloginUI {
                 return "Expected: join <ID> [WHITE|BLACK]";
             }
             String color = params[1].toUpperCase();
+
+            GameData game = gameList.get(gameId);
+            if (game == null) {
+                return String.format("Game with ID %d not found.", gameId);
+            }
+
+            if (color.equals("WHITE")) {
+                if (game.getWhiteUsername() != null && !game.getWhiteUsername().isEmpty()) {
+                    return "The White position is already taken in this game.";
+                }
+            } else if (color.equals("BLACK")) {
+                if (game.getBlackUsername() != null && !game.getBlackUsername().isEmpty()) {
+                    return "The Black position is already taken in this game.";
+                }
+            } else {
+                return "Expected: join <ID> [WHITE|BLACK]";
+            }
+
             serverFacade.joinGame(authToken, gameId, color);
             return String.format("Joined game %d as %s", gameId, color);
         }
