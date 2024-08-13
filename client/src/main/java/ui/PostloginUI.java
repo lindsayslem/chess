@@ -1,5 +1,6 @@
 package ui;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import model.GameData;
@@ -11,12 +12,16 @@ public class PostloginUI {
     private final String authToken;
     private final String username;
     private Map<Integer, GameData> gameList;
+    private GameplayUI gameplayUI;
+    private String playerColor;
+    private int gameId;
 
     public PostloginUI(ServerFacade serverFacade, Scanner scanner, String authToken, String username) {
         this.serverFacade = serverFacade;
         this.scanner = scanner;
         this.authToken = authToken;
         this.username = username;
+        this.playerColor = playerColor;
     }
 
     public void show() {
@@ -154,14 +159,21 @@ public class PostloginUI {
                 return "Expected: observe <ID>";
             }
             serverFacade.observeGame(authToken, gameId);
-            GameplayUI.drawBoard();
+
+            // Create a GameplayUI instance and draw the board
+            gameplayUI = new GameplayUI("ws://localhost:8080/ws", authToken, username, playerColor, gameId);
+            gameplayUI.drawBoard();
+
             return String.format("Observing game %d", gameId);
         }
         return "Expected: observe <ID>";
     }
 
     private String playGame() {
-        GameplayUI.drawBoard();
+        // Create a GameplayUI instance and draw the board
+        gameplayUI = new GameplayUI("ws://localhost:8080/ws", authToken, username, playerColor, gameId);
+        gameplayUI.drawBoard();
+
         return "Game started.";
     }
 }

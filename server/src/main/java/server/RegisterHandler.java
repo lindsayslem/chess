@@ -30,6 +30,7 @@ public class RegisterHandler implements Route {
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
             AuthData authData = userService.register(userData);
+            System.out.println("Registering/Logging in user: " + userData.username());
             response.status(200);
             return gson.toJson(authData);
         }

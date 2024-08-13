@@ -3,13 +3,14 @@ package websocket.messages;
 import java.util.Objects;
 
 /**
- * Represents a Message the server can send through a WebSocket
- * 
+ * Represents a Message the server can send through a WebSocket.
+ *
  * Note: You can add to this class, but you should not alter the existing
  * methods.
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
+    private String game; // Add this field to store the game data as a JSON string
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -23,6 +24,14 @@ public class ServerMessage {
 
     public ServerMessageType getServerMessageType() {
         return this.serverMessageType;
+    }
+
+    public String getGame() {
+        return game;
+    }
+
+    public void setGame(String game) {
+        this.game = game;
     }
 
     @Override

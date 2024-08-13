@@ -40,6 +40,9 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("/web");
 
+        Spark.webSocket("/ws", WebSocketHandler.class);
+
+
         Spark.post("/user", new RegisterHandler(userService));
         Spark.delete("/db", new ClearHandler(clearService));
         Spark.post("/game", new CreateGameHandler(gameService));
@@ -47,7 +50,6 @@ public class Server {
         Spark.get("/game", new ListGamesHandler(gameService));
         Spark.post("/session", new LoginHandler(userService));
         Spark.delete("/session", new LogoutHandler(userService));
-
 
         loadGameData();
 
