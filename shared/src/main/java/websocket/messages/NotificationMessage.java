@@ -2,18 +2,29 @@ package websocket.messages;
 
 import com.google.gson.Gson;
 
-public record NotificationMessage(Type type, String message) {
+public class NotificationMessage {
     public enum Type {
         PLAYER_JOINED,
-        PLAYER_MOVED,
         PLAYER_LEFT,
-        PLAYER_RESIGNED,
-        CHECK,
-        CHECKMATE
+        PLAYER_MOVED,
+        PLAYER_RESIGNED
     }
 
-    @Override
-    public String toString() {
-        return new Gson().toJson(this);
+    private Type type;
+    private String message;
+
+    // Constructor with Type and message parameters
+    public NotificationMessage(Type type, String message) {
+        this.type = type;
+        this.message = message;
+    }
+
+    // Getter methods for the type and message
+    public Type getType() {
+        return type;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }
